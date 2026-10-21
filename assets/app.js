@@ -315,6 +315,7 @@
   }
 
   var chrome = {};
+  var lastCal = null;
   function render() {
     root.innerHTML = '';
     var es = L === 'es';
@@ -376,6 +377,7 @@
     var es = L === 'es', box = chrome.partC; box.innerHTML = '';
     if (acc.agenda) {
       var st = el('div', { 'class': 'status', role: 'status', 'aria-live': 'polite', hidden: true });
+      if (lastCal) status(st, lastCal.k, lastCal.m);
       var inp = el('input', { type: 'email', id: 'a-cal', value: acc.calendario.correo || acc.email });
       var btn = el('button', { type: 'submit', 'class': 'btn small', text: es ? 'Verificar conexión' : 'Check connection' });
       var form = el('form', { 'class': 'card form', novalidate: true }, [
@@ -395,13 +397,14 @@
           if (r.cuenta) acc = r.cuenta;
           if (r.ok && r.escritura) {
             var tzw = r.zona && r.zona !== 'America/New_York' ? (es ? ' Ojo: su calendario está en ' + r.zona + '; Sofía agenda en hora del Este.' : ' Note: your calendar is set to ' + r.zona + '; Sofía books in Eastern time.') : '';
-            status(st, 'ok', (es ? 'Conectado. Podemos leer y crear eventos. Eventos en los próximos 7 días: ' : 'Connected. We can read and create events. Events in the next 7 days: ') + r.ocupados7d + '.' + tzw);
+            lastCal = { k: 'ok', m: (es ? 'Conectado. Podemos leer y crear eventos. Eventos en los próximos 7 días: ' : 'Connected. We can read and create events. Events in the next 7 days: ') + r.ocupados7d + '.' + tzw };
             refreshChrome(); return;
           }
           var msg = { sin_acceso: es ? 'Todavía no vemos ese calendario. Revise que lo compartió con hola@usecontesta.com y que el correo es el correcto. A veces tarda un minuto.' : 'We can\'t see that calendar yet. Check that you shared it with hola@usecontesta.com and that the email is right. It can take a minute.',
             solo_lectura: es ? 'Vemos el calendario, pero sin permiso para crear citas. Cambie el permiso a "Hacer cambios en eventos".' : 'We can see the calendar but can\'t create events. Change the permission to "Make changes to events".',
             validacion: T.errs.correo, limite: T.errs.limite, red: T.errs.red }[r.error] || T.errs.servidor;
-          status(st, r.error === 'red' || r.error === 'servidor' ? 'err' : 'warn', msg);
+          lastCal = { k: r.error === 'red' || r.error === 'servidor' ? 'err' : 'warn', m: msg };
+          status(st, lastCal.k, lastCal.m);
         });
       });
       box.appendChild(form);
@@ -475,5 +478,5 @@
       acc.primeraLlamada ? el('p', { 'class': 'status ok', text: (es ? 'Primera llamada de un cliente: ' : 'First customer call: ') + when(acc.primeraLlamada) }) : null]));
   }
 
-  if (PAGE === 'signup') signup(); else load();
+  if (PAGE === 'signup') signup(); else { load(); window.addEventListener('hashchange', function () { if (/t=/.test(location.hash)) load(); }); }
 })();

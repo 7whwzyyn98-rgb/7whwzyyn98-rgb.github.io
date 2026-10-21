@@ -7,10 +7,37 @@ Facts used here were verified on Oct 21, 2026:
 - Forwarding codes: Verizon support FAQ and T-Mobile self-service short codes pages (AT&T publishes no codes on its page).
 - Offer: $197 / $297 / $597 per month with 150 / 400 / 1,000 minutes; 14-day trial; card required to start it (owner decision,
   Oct 21); $297 setup waived for the first five businesses; no contract.
+- Setup fee timing (Oct 21): one-time, billed with the first monthly payment at trial end; never during setup, while waiting
+  or during the trial; nothing if cancelled during the trial. "First five" = first five businesses to start a trial.
+- Minutes = time Sofía is on calls (Retell start-to-end), summed per calendar month, Eastern time (same as the Minutos sheet).
+  Over the limit: she keeps answering, the owner is emailed once that month (backend cadaHora), nothing extra is charged.
 """
 import html
 
 E = html.escape
+
+# Stripe checkout waits on the EIN (owner, Oct 21). While False the primary CTA is "Set up your receptionist" with the
+# waiting note beside it, and the availability notices show. Flip to True only after the LIVE Stripe flow is verified end
+# to end and the backend Script Property ACTIVACION is 'abierta'; then rebuild. That switches every CTA to
+# "Start your 14-day trial", removes the notices and adds Stripe to the privacy policy's processor list.
+ACTIVATION_LIVE = False
+
+
+def cta_text(lang):
+    if ACTIVATION_LIVE:
+        return 'Empiece su prueba de 14 días' if lang == 'es' else 'Start your 14-day trial'
+    return 'Configure su recepcionista' if lang == 'es' else 'Set up your receptionist'
+
+
+def cta_note(lang):
+    """The explanation that sits beside the temporary CTA. The email it promises is sent by the backend (notificarActivacion_)."""
+    if ACTIVATION_LIVE:
+        return ''
+    t = ('Cree su cuenta y prepare su recepcionista desde ahora. Le avisaremos por correo cuando la activación de la prueba esté disponible. '
+         'Su prueba de 14 días no empieza mientras espera.' if lang == 'es' else
+         'Create your account and prepare your receptionist now. We’ll email you when trial activation is available. '
+         'Your 14-day trial won’t begin while you’re waiting.')
+    return f'<p class="cta-note">{E(t)}</p>'
 REC = 'https://dxc03zgurdly9.cloudfront.net/54df0e4fd8e65e8bf9245a439269943b31fe88508016b6ee988afa8f4ab883e2/recording.wav'
 TEL = 'tel:+18137221120'
 SITE = 'https://usecontesta.com'
@@ -47,8 +74,8 @@ PAGES = {
                'desc': 'Sofía answers your business calls 24/7, books appointments in your Google Calendar and emails you a summary. From $197 a month. Hear a real call.',
                'crumb': 'Home', 'ld': [ORG, service_ld('en')]}),
     'pricing': P('/es/precios/', '/en/pricing/',
-                 {'title': 'Precios · Contesta', 'desc': 'Planes de $197, $297 y $597 al mes con 150, 400 y 1,000 minutos. Prueba de 14 días, sin contrato. Instalación de $297 sin costo para los primeros 5 negocios.', 'crumb': 'Precios', 'ld': [service_ld('es')]},
-                 {'title': 'Pricing · Contesta', 'desc': 'Plans at $197, $297 and $597 a month with 150, 400 and 1,000 minutes. 14-day trial, no contract. $297 setup waived for the first 5 businesses.', 'crumb': 'Pricing', 'ld': [service_ld('en')]}),
+                 {'title': 'Precios de Contesta: planes desde $197 al mes', 'desc': 'Planes de $197, $297 y $597 al mes con 150, 400 y 1,000 minutos. Prueba de 14 días sin cobro y sin contrato. Qué pasa si se pasa de minutos y cuándo se cobra la instalación.', 'crumb': 'Precios', 'ld': [service_ld('es')]},
+                 {'title': 'Contesta pricing: plans from $197 a month', 'desc': 'Plans at $197, $297 and $597 a month with 150, 400 and 1,000 minutes. 14-day trial with no charge and no contract. What happens if you go over and when setup is billed.', 'crumb': 'Pricing', 'ld': [service_ld('en')]}),
     'how': P('/es/como-funciona/', '/en/how-it-works/',
              {'title': 'Cómo funciona · Contesta', 'desc': 'De la cuenta a la primera llamada: qué le pedimos, cómo conecta Google Calendar, cómo probar antes de tocar su línea y cómo activar o quitar el desvío.', 'crumb': 'Cómo funciona'},
              {'title': 'How it works · Contesta', 'desc': 'From account to first call: what we ask for, how Google Calendar connects, how to test before touching your line, and how to turn forwarding on or off.', 'crumb': 'How it works'}),
@@ -94,9 +121,9 @@ PAGES = {
 }
 
 NAV = {
-    'es': {'links': [('how', 'Cómo funciona'), ('pricing', 'Precios'), ('demo', 'Demo'), ('guides', 'Guías')], 'cta': 'Solicitar prueba', 'menu': 'Menú',
+    'es': {'links': [('how', 'Cómo funciona'), ('pricing', 'Precios'), ('demo', 'Demo'), ('guides', 'Guías')], 'cta': cta_text('es'), 'menu': 'Menú',
            'aria': 'Principal', 'skip': 'Saltar al contenido', 'switch': 'English version'},
-    'en': {'links': [('how', 'How it works'), ('pricing', 'Pricing'), ('demo', 'Demo'), ('guides', 'Guides')], 'cta': 'Request a trial', 'menu': 'Menu',
+    'en': {'links': [('how', 'How it works'), ('pricing', 'Pricing'), ('demo', 'Demo'), ('guides', 'Guides')], 'cta': cta_text('en'), 'menu': 'Menu',
            'aria': 'Main', 'skip': 'Skip to content', 'switch': 'Versión en español'},
 }
 
@@ -166,32 +193,47 @@ def audio(lang):
 
 def plans(lang, cta=True):
     es = lang == 'es'
-    data = [('inicial', 'Inicial' if es else 'Starter', 197, '150', ['Español e inglés' if es else 'Spanish and English', 'Citas en Google Calendar' if es else 'Google Calendar booking', 'Resumen de cada llamada por correo' if es else 'Emailed summary of every call'], False),
-            ('pro', 'Pro', 297, '400', ['Todo lo del plan Inicial' if es else 'Everything in Starter', 'Transferencias a su celular para urgencias' if es else 'Urgent transfers to your cell'], True),
-            ('maximo', 'Máximo' if es else 'Max', 597, '1,000', ['Todo lo del plan Pro' if es else 'Everything in Pro', 'Varias líneas o sucursales' if es else 'Multiple lines or locations', 'Soporte prioritario' if es else 'Priority support'], False)]
+    data = [('inicial', 'Inicial' if es else 'Starter', 197, '150', '75',
+             'Para negocios de una o dos personas que pierden algunas llamadas al día.' if es else 'For one- or two-person businesses that miss a few calls a day.',
+             ['Español e inglés' if es else 'Spanish and English', 'Citas en Google Calendar' if es else 'Google Calendar booking',
+              'Resumen de cada llamada por correo' if es else 'Emailed summary of every call'], None),
+            ('pro', 'Pro', 297, '400', '200',
+             'Para negocios con más llamadas, o que quieren que les pasen las urgencias.' if es else 'For busier businesses, or owners who want urgent calls passed to them.',
+             ['Todo lo del plan Inicial' if es else 'Everything in Starter',
+              'Transferencias a su celular en horario: urgencias, quejas o cuando piden hablar con usted' if es else 'Transfers to your cell during business hours: urgent calls, complaints or callers asking for you'],
+             'Con transferencias' if es else 'Includes transfers'),
+            ('maximo', 'Máximo' if es else 'Max', 597, '1,000', '500',
+             'Para negocios con mucho volumen de llamadas, o con varias líneas o sucursales.' if es else 'For high call volume, or several lines or locations.',
+             ['Todo lo del plan Pro' if es else 'Everything in Pro',
+              'Varias líneas o sucursales: escríbanos y lo configuramos con usted' if es else 'Multiple lines or locations: email us and we set it up with you',
+              'Soporte prioritario' if es else 'Priority support'], None)]
     out = '<div class="plans">'
-    for key, name, price, mins, feats, feat in data:
+    for key, name, price, mins, calls, fit, feats, tag in data:
         lis = ''.join(f'<li>{E(f)}</li>' for f in feats)
-        tag = f'<span class="label-chip lime">{"Más elegido" if es else "Most chosen"}</span>' if feat else ''
-        btn = (f'<a class="btn{"" if feat else " ghost"}" href="{u("signup", lang)}?plan={key}" data-plan="{key}">{"Solicitar prueba" if es else "Request a trial"}</a>' if cta else '')
-        out += f'''<div class="card plan{' featured' if feat else ''}"><div class="name"><span>{E(name)}</span>{tag}</div>
+        chip = f'<span class="label-chip lime">{E(tag)}</span>' if tag else ''
+        featured = key == 'pro'
+        btn = (f'<a class="btn{"" if featured else " ghost"}" href="{u("signup", lang)}?plan={key}" data-plan="{key}">{E(cta_text(lang))}</a>' if cta else '')
+        out += f'''<div class="card plan{' featured' if featured else ''}"><div class="name"><span>{E(name)}</span>{chip}</div>
 <div class="price">${price}<span>/{"mes" if es else "mo"}</span></div>
-<p class="muted">{mins} {"minutos al mes" if es else "minutes a month"}</p><ul>{lis}</ul>{btn}</div>'''
-    return out + '</div>'
+<p class="fit">{E(fit)}</p>
+<p class="muted"><b>{mins} {"minutos al mes" if es else "minutes a month"}</b><br><span class="small">{"Por ejemplo, unas " + calls + " llamadas de 2 minutos." if es else "For example, about " + calls + " two-minute calls."}</span></p><ul>{lis}</ul>{btn}</div>'''
+    return out + '</div>' + (cta_note(lang) if cta else '')
 
 
 def terms(lang):
     if lang == 'es':
-        items = ['Prueba de 14 días. Para empezarla se pide una tarjeta; no se cobra nada durante la prueba y la mensualidad empieza al terminar, si no cancela.',
-                 'Instalación: $297. Sin costo para los primeros 5 negocios.',
-                 'Sin contrato. Puede cancelar cuando quiera.',
-                 'El registro de tarjeta en línea se está habilitando. Mientras tanto puede crear su cuenta y dejar todo configurado; le escribimos cuando pueda activar.']
+        items = ['Prueba de 14 días: empieza cuando registra su tarjeta y no se cobra nada durante la prueba. Al terminar empieza la mensualidad de su plan, salvo que cancele antes.',
+                 'Minutos: el tiempo que Sofía pasa en llamadas, sumado por mes calendario. Si se pasa, Sofía sigue contestando: le avisamos por correo y le sugerimos otro plan, sin cobros extra sin su acuerdo.',
+                 'Instalación: $297, pago único. No se cobra mientras configura, mientras espera la activación ni durante la prueba: se cobra junto con el primer pago mensual. Si cancela durante la prueba, no paga nada. Sin costo para los primeros cinco negocios que empiecen su prueba.',
+                 'Sin contrato. Cancele cuando quiera.']
+        links = f'Detalles en los <a href="{u("terms", lang)}">Términos del servicio</a> y la <a href="{u("privacy", lang)}">Política de privacidad</a>.'
     else:
-        items = ['14-day trial. A card is required to start it; nothing is charged during the trial and the monthly plan starts when it ends, unless you cancel.',
-                 'Setup: $297. Waived for the first 5 businesses.',
-                 'No contract. Cancel any time.',
-                 'Online card entry is being enabled. Meanwhile you can create your account and finish setup; we\'ll email you when you can activate.']
-    return '<ul class="terms">' + ''.join(f'<li>{E(i)}</li>' for i in items) + '</ul>'
+        items = ['14-day trial: it starts when you add your card, and nothing is charged during the trial. When it ends, your monthly plan starts unless you cancel before.',
+                 'Minutes: the time Sofía spends on calls, added up per calendar month. If you go over, Sofía keeps answering: we email you and suggest another plan, and nothing extra is charged unless you agree.',
+                 'Setup: $297, one-time. It is never charged while you set up, while you wait for activation or during the trial: it is charged with your first monthly payment. Cancel during the trial and you pay nothing. Waived for the first five businesses to start a trial.',
+                 'No contract. Cancel any time.']
+        links = f'Details in the <a href="{u("terms", lang)}">Terms of service</a> and the <a href="{u("privacy", lang)}">Privacy policy</a>.'
+    return '<ul class="terms">' + ''.join(f'<li>{E(i)}</li>' for i in items) + f'</ul><p class="small muted terms-links">{links}</p>'
 
 
 def cta_band(lang, title=None):
@@ -200,9 +242,9 @@ def cta_band(lang, title=None):
     return f'''<section><div class="wrap"><div class="cta-band">
 <h2>{E(t)}</h2>
 <p>{"Cree su cuenta en un minuto, configure su negocio a su ritmo y pruébela desde su celular antes de cambiar nada en su línea." if es else "Create your account in a minute, set up your business at your own pace and test it from your cell before changing anything on your line."}</p>
-<div class="btn-row"><a class="btn" href="{u('signup', lang)}">{"Solicite su prueba de 14 días" if es else "Request your 14-day trial"}</a>
+<div class="btn-row"><a class="btn" href="{u('signup', lang)}">{E(cta_text(lang))}</a>
 <a href="{TEL}">{"O llame a la demo: (813) 722-1120" if es else "Or call the demo: (813) 722-1120"}</a></div>
-</div></div></section>'''
+{cta_note(lang)}</div></div></section>'''
 
 
 def faq(items):
@@ -248,7 +290,7 @@ def home(lang):
         compat = [('¿Tengo que cambiar mi número?', 'No. Activa el desvío de llamadas en su teléfono y las llamadas que usted no contesta pasan a Sofía. En Verizon es <code>*71</code> más el número; en T-Mobile, <code>**61*1</code> más el número y <code>#</code>. <a href="' + u('g_forward', lang) + '">Guía completa, con AT&amp;T y líneas fijas</a>.'),
                   ('¿Qué calendario necesito?', 'Google Calendar. Lo comparte con hola@usecontesta.com con permiso para hacer cambios, y Sofía revisa sus horas ocupadas antes de ofrecer una cita. Por ahora no conectamos con otros sistemas de citas. <a href="' + u('calendar', lang) + '">Cómo funciona la agenda</a>.'),
                   ('¿Qué escuchan sus clientes?', 'Sofía contesta con el nombre de su negocio, dice que es la asistente virtual y que la llamada puede ser grabada, y sigue en el idioma de quien llama.'),
-                  ('¿Qué pasa después de registrarme?', 'Configura su negocio en su cuenta (servicios, horario, respuestas), conecta el calendario y registra su tarjeta. Construimos su número de Contesta, lo prueba desde su celular y, cuando sale bien, activa el desvío. <a href="' + u('how', lang) + '">Paso a paso</a>.')]
+                  ('¿Qué pasa después de registrarme?', 'Configura su negocio en su cuenta (servicios, horario, respuestas), conecta el calendario y registra su tarjeta para empezar la prueba' + ('' if ACTIVATION_LIVE else ' (cuando la activación esté disponible; le avisamos por correo)') + '. Construimos su número de Contesta, lo prueba desde su celular y, cuando sale bien, activa el desvío. <a href="' + u('how', lang) + '">Paso a paso</a>.')]
         faqs = [('¿Sofía dice que es una inteligencia artificial?', '<p>Sí. Al contestar dice que es la asistente virtual. Si alguien pregunta si es un robot, lo confirma y ofrece tomar la cita o el mensaje.</p>'),
                 ('¿Qué hace si le preguntan algo que no sabe?', '<p>No lo inventa. Toma nombre, teléfono y motivo, y le avisa a usted en el resumen, incluida la pregunta exacta que no pudo contestar.</p>'),
                 ('¿Manda mensajes de texto?', '<p>Todavía no. Hoy los resúmenes le llegan por correo después de cada llamada.</p>'),
@@ -260,7 +302,8 @@ def home(lang):
 <p class="eyebrow">Recepcionista con IA · Florida</p>
 <h1>Su recepcionista con IA,<br> <span class="mark">en español e inglés.</span></h1>
 <p class="lede">Sofía atiende llamadas, agenda citas en su Google Calendar y le envía un resumen mientras usted trabaja. Disponible las 24 horas.</p>
-<div class="btn-row"><a class="btn" href="{u('signup', lang)}">Solicite su prueba de 14 días</a><a class="btn ghost" href="#demo">Escuche a Sofía</a></div>
+<div class="btn-row"><a class="btn" href="{u('signup', lang)}">{E(cta_text(lang))}</a><a class="btn ghost" href="#demo">Escuche a Sofía</a></div>
+{cta_note(lang)}
 <p class="demo-line">¿Prefiere llamar? Pruébela en vivo: <a href="{TEL}">(813) 722-1120</a></p>
 <p class="brandline">Usted trabaja. Contesta responde.</p>
 </div>
@@ -280,7 +323,7 @@ def home(lang):
 <div class="grid-3">
 <div class="card step"><span class="step-n">1</span><h3>Cree su cuenta</h3><p class="muted">Elija su plan y escriba su correo y el nombre del negocio. Toma un minuto.</p></div>
 <div class="card step"><span class="step-n">2</span><h3>Enséñele su negocio</h3><p class="muted">Servicios con precio y duración, horario, respuestas aprobadas y a quién avisar. Cada paso se guarda; puede volver cuando quiera.</p></div>
-<div class="card step"><span class="step-n">3</span><h3>Pruebe y active</h3><p class="muted">Conecte Google Calendar, registre su tarjeta y llame a su nuevo número desde su celular. Si la prueba sale bien, active el desvío.</p></div>
+<div class="card step"><span class="step-n">3</span><h3>Pruebe y active</h3><p class="muted">Conecte Google Calendar, empiece su prueba con su tarjeta y llame a su nuevo número desde su celular. Si la prueba sale bien, active el desvío.{"" if ACTIVATION_LIVE else " La activación con tarjeta todavía no está disponible; le avisamos por correo."}</p></div>
 </div><p style="margin-top:18px"><a href="{u('how', lang)}">Ver el paso a paso completo</a></p></div></section>
 <section class="tight"><div class="wrap">
 <div class="sec-head"><p class="eyebrow">Para quién es</p><h2>Negocios que viven del teléfono y de las citas.</h2></div>
@@ -302,7 +345,7 @@ def home(lang):
     compat = [('Do I have to change my number?', 'No. You turn on call forwarding on your phone, and calls you don\'t answer go to Sofía. On Verizon it\'s <code>*71</code> plus the number; on T-Mobile, <code>**61*1</code> plus the number and <code>#</code>. <a href="' + u('g_forward', lang) + '">Full guide, including AT&amp;T and landlines</a>.'),
               ('Which calendar do I need?', 'Google Calendar. You share it with hola@usecontesta.com with permission to make changes, and Sofía checks your busy times before offering an appointment. We don\'t connect to other booking systems yet. <a href="' + u('calendar', lang) + '">How booking works</a>.'),
               ('What do your callers hear?', 'Sofía answers with your business name, says she\'s the virtual assistant and that the call may be recorded, and continues in the caller\'s language.'),
-              ('What happens after I sign up?', 'You set up your business in your account (services, hours, answers), connect your calendar and add your card. We build your Contesta number, you test it from your cell and, once it works, you turn on forwarding. <a href="' + u('how', lang) + '">Step by step</a>.')]
+              ('What happens after I sign up?', 'You set up your business in your account (services, hours, answers), connect your calendar and add your card to start the trial' + ('' if ACTIVATION_LIVE else ' (once activation is available; we’ll email you)') + '. We build your Contesta number, you test it from your cell and, once it works, you turn on forwarding. <a href="' + u('how', lang) + '">Step by step</a>.')]
     faqs = [('Does Sofía say she\'s an AI?', '<p>Yes. When she answers she says she\'s the virtual assistant. If someone asks whether she\'s a robot, she confirms it and offers to take the appointment or message.</p>'),
             ('What if someone asks something she doesn\'t know?', '<p>She doesn\'t make it up. She takes name, number and reason, and tells you in the summary, including the exact question she couldn\'t answer.</p>'),
             ('Does she send text messages?', '<p>Not yet. Today summaries reach you by email after every call.</p>'),
@@ -314,7 +357,8 @@ def home(lang):
 <p class="eyebrow">AI receptionist · Florida</p>
 <h1>Your AI receptionist,<br> <span class="mark">in English and Spanish.</span></h1>
 <p class="lede">Sofía answers calls, books appointments in Google Calendar, and sends you a summary while you work. Available 24/7.</p>
-<div class="btn-row"><a class="btn" href="{u('signup', lang)}">Request your 14-day trial</a><a class="btn ghost" href="#demo">Hear Sofía</a></div>
+<div class="btn-row"><a class="btn" href="{u('signup', lang)}">{E(cta_text(lang))}</a><a class="btn ghost" href="#demo">Hear Sofía</a></div>
+{cta_note(lang)}
 <p class="demo-line">Rather call? Try her live: <a href="{TEL}">(813) 722-1120</a></p>
 <p class="brandline">You work. Contesta answers.</p>
 </div>
@@ -335,7 +379,7 @@ def home(lang):
 <div class="grid-3">
 <div class="card step"><span class="step-n">1</span><h3>Create your account</h3><p class="muted">Pick a plan and enter your email and business name. It takes a minute.</p></div>
 <div class="card step"><span class="step-n">2</span><h3>Teach her your business</h3><p class="muted">Services with price and length, hours, approved answers and who to notify. Each step saves; come back any time.</p></div>
-<div class="card step"><span class="step-n">3</span><h3>Test and go live</h3><p class="muted">Connect Google Calendar, add your card and call your new number from your cell. If the test works, turn on forwarding.</p></div>
+<div class="card step"><span class="step-n">3</span><h3>Test and go live</h3><p class="muted">Connect Google Calendar, start your trial with your card and call your new number from your cell. If the test works, turn on forwarding.{"" if ACTIVATION_LIVE else " Card activation isn’t available yet; we’ll email you when it is."}</p></div>
 </div><p style="margin-top:18px"><a href="{u('how', lang)}">See the full step by step</a></p></div></section>
 <section class="tight"><div class="wrap">
 <div class="sec-head"><p class="eyebrow">Who it's for</p><h2>Businesses that live on the phone and on appointments.</h2></div>
@@ -360,18 +404,24 @@ def home(lang):
 def page_body(key, lang):
     es = lang == 'es'
     if key == 'pricing':
-        q = [('¿Cuándo se cobra?', '<p>Nada durante los 14 días de prueba. Para empezar la prueba se registra una tarjeta, y la mensualidad del plan que eligió empieza al terminar la prueba, si no cancela antes.</p>'),
-             ('¿Puedo registrar mi tarjeta hoy?', '<p>Todavía no: estamos habilitando el pago seguro en línea. Puede crear su cuenta y dejar su recepcionista configurada; le escribimos por correo cuando pueda registrar la tarjeta y activar.</p>'),
-             ('¿Qué cubre la instalación de $297?', '<p>La construcción de su recepcionista y de su número de Contesta. Los primeros 5 negocios no la pagan.</p>'),
-             ('¿Puedo cambiar de plan?', '<p>Sí. Antes de registrar su tarjeta lo cambia en su cuenta; después, escríbanos a hola@usecontesta.com.</p>'),
-             ('¿Qué pasa si me paso de los minutos?', '<p>Sofía sigue contestando. Le escribimos y le sugerimos un plan más grande; no cobramos nada extra sin su acuerdo.</p>'),
-             ('¿Cómo cancelo?', '<p>Escríbanos a hola@usecontesta.com. No hay contrato. El servicio sigue hasta el final del mes pagado; no hay reembolsos por meses parciales. Para que las llamadas vuelvan a su teléfono de inmediato, quite el desvío desde su teléfono.</p>')] if es else \
-            [('When am I charged?', '<p>Nothing during the 14-day trial. A card is added to start the trial, and the monthly price of the plan you chose starts when the trial ends, unless you cancel first.</p>'),
-             ('Can I add my card today?', '<p>Not yet: we\'re enabling secure online payment. You can create your account and finish setting up your receptionist; we\'ll email you when you can add the card and activate.</p>'),
-             ('What does the $297 setup cover?', '<p>Building your receptionist and your Contesta number. The first 5 businesses don\'t pay it.</p>'),
-             ('Can I change plans?', '<p>Yes. Before adding your card you change it in your account; after that, email hola@usecontesta.com.</p>'),
-             ('What if I go over my minutes?', '<p>Sofía keeps answering. We email you and suggest a bigger plan; nothing extra is charged unless you agree.</p>'),
-             ('How do I cancel?', '<p>Email hola@usecontesta.com. There\'s no contract. Service runs to the end of the paid month; partial months aren\'t refunded. To send calls back to your phone right away, turn forwarding off from your phone.</p>')]
+        if es:
+            q = [('¿Cuándo se cobra?', '<p>Nada mientras configura su cuenta ni durante los 14 días de prueba. La prueba empieza cuando registra su tarjeta; al terminar se cobra la mensualidad del plan que eligió (y la instalación, si le aplica), salvo que cancele antes.</p>')]
+            if not ACTIVATION_LIVE:
+                q.append(('¿Puedo empezar la prueba hoy?', '<p>Todavía no: la activación de la prueba con tarjeta aún no está disponible. Puede crear su cuenta y dejar su recepcionista configurada hoy; le avisaremos por correo cuando pueda activarla. Su prueba de 14 días no empieza mientras espera y no se cobra nada.</p>'))
+            q += [('¿Cuándo se cobra la instalación de $297 y quién no la paga?', '<p>Es un pago único por construir su recepcionista y su número de Contesta. Se cobra junto con su primer pago mensual, al terminar la prueba. Nunca se cobra mientras configura, mientras espera la activación ni durante la prueba, y si cancela durante la prueba no paga nada.</p><p>Los primeros cinco negocios que empiecen su prueba no la pagan. Su cuenta y la página de pago le dicen si le aplica antes de registrar la tarjeta.</p>'),
+                  ('¿Qué cuenta como minuto?', '<p>El tiempo que Sofía está en una llamada, desde que contesta hasta que cuelga, sumado por mes calendario (hora del Este). Las llamadas que usted contesta no cuentan. Con llamadas de unos 2 minutos, 150 minutos son unas 75 llamadas al mes.</p>'),
+                  ('¿Qué pasa si me paso de los minutos?', '<p>Sofía sigue contestando: no le cortamos el servicio. Le avisamos por correo ese mismo mes y le sugerimos el plan que le queda mejor; no cobramos nada extra sin su acuerdo.</p>'),
+                  ('¿Puedo cambiar de plan?', '<p>Sí. Antes de empezar la prueba lo cambia en su cuenta; después, escríbanos a hola@usecontesta.com.</p>'),
+                  ('¿Cómo cancelo?', '<p>' + ('Desde su cuenta, en "Administrar pago o cancelar", o escribiéndonos a hola@usecontesta.com. ' if ACTIVATION_LIVE else 'Escríbanos a hola@usecontesta.com. ') + 'No hay contrato. Si cancela durante la prueba, no se cobra nada. Después, el servicio sigue hasta el final del mes pagado y no hay reembolsos por meses parciales. Para que las llamadas vuelvan a su teléfono de inmediato, quite el desvío desde su teléfono.</p>')]
+        else:
+            q = [('When am I charged?', '<p>Nothing while you set up your account or during the 14-day trial. The trial starts when you add your card; when it ends, the monthly price of the plan you chose is charged (plus setup, if it applies to you), unless you cancel first.</p>')]
+            if not ACTIVATION_LIVE:
+                q.append(('Can I start the trial today?', '<p>Not yet: card activation for the trial isn’t available yet. You can create your account and finish setting up your receptionist today; we’ll email you when you can activate it. Your 14-day trial won’t begin while you’re waiting, and nothing is charged.</p>'))
+            q += [('When is the $297 setup fee charged, and who doesn’t pay it?', '<p>It’s a one-time fee for building your receptionist and your Contesta number. It’s charged with your first monthly payment, when the trial ends. It is never charged while you set up, while you wait for activation or during the trial, and if you cancel during the trial you pay nothing.</p><p>The first five businesses to start a trial don’t pay it. Your account and the payment page tell you whether it applies before you add your card.</p>'),
+                  ('What counts as a minute?', '<p>The time Sofía is on a call, from when she answers until the call ends, added up per calendar month (Eastern time). Calls you answer yourself don’t count. With calls of about 2 minutes, 150 minutes is about 75 calls a month.</p>'),
+                  ('What if I go over my minutes?', '<p>Sofía keeps answering: we don’t cut off your service. We email you that same month and suggest the plan that fits better; nothing extra is charged unless you agree.</p>'),
+                  ('Can I change plans?', '<p>Yes. Before starting the trial you change it in your account; after that, email hola@usecontesta.com.</p>'),
+                  ('How do I cancel?', '<p>' + ('From your account, under "Manage billing or cancel", or by emailing hola@usecontesta.com. ' if ACTIVATION_LIVE else 'Email hola@usecontesta.com. ') + 'There’s no contract. Cancel during the trial and nothing is charged. After that, service runs to the end of the paid month and partial months aren’t refunded. To send calls back to your phone right away, turn forwarding off from your phone.</p>')]
         inc = (['Español e inglés: contesta en el idioma de quien llama', 'Citas en su Google Calendar, sin agendar encima de horas ocupadas', 'Resumen de cada llamada por correo, con la conversación escrita',
                 'Respuestas solo de la información que usted aprobó', 'Aviso de grabación y de asistente virtual en cada llamada'] if es else
                ['English and Spanish: answers in the caller\'s language', 'Appointments in your Google Calendar, never over busy times', 'Email summary of every call, with the written conversation',
@@ -397,7 +447,7 @@ def page_body(key, lang):
                      ('2. Configure su negocio', 'Siete pasos cortos que se guardan por separado: su negocio (y si va a donde el cliente, su zona), servicios con precio y duración, horario, saludo, respuestas aprobadas, contacto y transferencias. Cada campo trae un ejemplo.'),
                      ('3. Conecte Google Calendar', 'Si quiere que Sofía agende, comparte su calendario con hola@usecontesta.com con permiso para hacer cambios. Al tocar Verificar probamos de verdad que podemos leer y crear eventos (creamos uno de prueba y lo borramos al instante).'),
                      ('4. Revise lo que Sofía va a usar', 'Su cuenta le muestra el resumen exacto: zona horaria, horario, servicios y duraciones, anticipación, tiempo entre citas, qué hace fuera de horario y cuándo transfiere.'),
-                     ('5. Registre su tarjeta', 'Se pide para empezar la prueba de 14 días; no se cobra nada durante la prueba. El registro en línea se está habilitando: mientras tanto, su configuración queda guardada y le escribimos cuando pueda activar.'),
+                     ('5. Empiece su prueba', 'Registra su tarjeta en la página segura de pago para empezar la prueba de 14 días; no se cobra nada durante la prueba. La instalación, si le aplica, se cobra con el primer pago mensual.' + ('' if ACTIVATION_LIVE else ' Esta activación todavía no está disponible: su configuración queda guardada, su prueba no empieza mientras espera y le avisamos por correo cuando pueda activar.')),
                      ('6. Pruebe desde su celular', 'Construimos su número de Contesta. Llámelo desde su celular y pida una cita: sus clientes no notan nada todavía. Su cuenta marca la prueba como aprobada cuando llega la llamada y el resumen.'),
                      ('7. Active el desvío', 'Desde el teléfono del negocio marca el código de su compañía. Las llamadas que usted no contesta pasan a Sofía; su número no cambia. Para pausar, quita el desvío.')]
         else:
@@ -405,7 +455,7 @@ def page_body(key, lang):
                      ('2. Set up your business', 'Seven short steps that save separately: your business (and your service area if you go to customers), services with price and length, hours, greeting, approved answers, contact and transfers. Every field has an example.'),
                      ('3. Connect Google Calendar', 'If you want Sofía to book, share your calendar with hola@usecontesta.com with permission to make changes. When you tap Check, we really test that we can read and create events (we create a test event and delete it right away).'),
                      ('4. Review what Sofía will use', 'Your account shows the exact summary: time zone, hours, services and lengths, notice, buffer between appointments, what happens after hours and when she transfers.'),
-                     ('5. Add your card', 'It\'s required to start the 14-day trial; nothing is charged during the trial. Online card entry is being enabled: meanwhile your setup stays saved and we\'ll email you when you can activate.'),
+                     ('5. Start your trial', 'Add your card on the secure payment page to start the 14-day trial; nothing is charged during the trial. Setup, if it applies to you, is charged with the first monthly payment.' + ('' if ACTIVATION_LIVE else ' This activation isn’t available yet: your setup stays saved, your trial won’t begin while you’re waiting, and we’ll email you when you can activate.')),
                      ('6. Test from your cell', 'We build your Contesta number. Call it from your cell and ask for an appointment: your customers notice nothing yet. Your account marks the test as passed once the call and summary come through.'),
                      ('7. Turn on forwarding', 'From the business phone, dial your carrier\'s code. Calls you don\'t answer go to Sofía; your number stays the same. To pause, turn forwarding off.')]
         st = ''.join(f'<div class="card stack"><h3>{E(t)}</h3><p class="muted">{E(d)}</p></div>' for t, d in steps)
@@ -527,7 +577,7 @@ def page_body(key, lang):
 <p>{"Verizon y AT&T indican que las llamadas desviadas se facturan como llamadas normales de su plan; revise su plan si tiene minutos limitados." if es else "Verizon and AT&T say forwarded calls are billed like regular calls on your plan; check your plan if your minutes are limited."}</p>
 <h2>{"Cómo pausar o quitarlo" if es else "How to pause or remove it"}</h2>
 <p>{"Marque el código de \"Quitar\" de la tabla. Las llamadas vuelven a sonar solo en su teléfono. Puede activarlo otra vez cuando quiera." if es else "Dial the \"Turn it off\" code from the table. Calls ring only on your phone again. You can turn it back on whenever you like."}</p>
-<p><a class="btn" href="{u('signup', lang)}">{"Solicite su prueba de 14 días" if es else "Request your 14-day trial"}</a></p>
+<p><a class="btn" href="{u('signup', lang)}">{E(cta_text(lang))}</a></p>{cta_note(lang)}
 </div></section>'''
 
     if key == 'g_can':
@@ -597,7 +647,7 @@ def page_body(key, lang):
 <ol><li>{"Configura su negocio: servicios, horario, respuestas." if es else "Set up your business: services, hours, answers."}</li>
 <li>{"Conecta Google Calendar y registra su tarjeta para empezar la prueba de 14 días (no se cobra durante la prueba)." if es else "Connect Google Calendar and add your card to start the 14-day trial (nothing is charged during the trial)."}</li>
 <li>{"Prueba su número desde su celular y activa el desvío." if es else "Test your number from your cell and turn on forwarding."}</li></ol>
-<p class="small muted">{"El registro de tarjeta en línea se está habilitando; puede dejar todo listo hoy." if es else "Online card entry is being enabled; you can get everything ready today."}</p>
+{cta_note(lang)}
 <p class="small muted">{"¿Quiere escucharla antes?" if es else "Want to hear her first?"} <a href="{u('demo', lang)}">{"Escuche a Sofía" if es else "Hear Sofía"}</a></p></div>
 </div></section>'''
 
@@ -667,7 +717,7 @@ LEGAL_TEXT = {
                                  '<b>De quienes visitan este sitio:</b> un registro propio de páginas vistas, idioma, plan elegido, la fuente general de la visita (por ejemplo, "Google" o "directo") y un identificador de sesión al azar. No usamos cookies, y ese registro no incluye nombres, correos ni teléfonos. Su navegador guarda su idioma, cómo llegó la primera vez y su sesión de la página de cuenta.']),
         ('Para qué los usamos', ['Para contestar y dirigir las llamadas de nuestros clientes, agendar citas en su calendario, enviar los resúmenes de llamadas, permitir que entren a su cuenta con un enlace por correo, dar soporte y medir en conjunto cómo funcionan el sitio y el registro.']),
         ('Acceso al calendario', ['Si un negocio activa las citas, comparte un Google Calendar con hola@usecontesta.com. Leemos los eventos de ese calendario para ver las horas ocupadas y creamos las citas en él. Si deja de compartirlo, el acceso termina.']),
-        ('Proveedores que procesan datos por nosotros', ['Retell AI (números de teléfono, voz con IA, grabaciones y transcripciones); Google Workspace (correo, calendario, hojas de cálculo y la automatización que hace funcionar el servicio); GitHub (alojamiento del sitio); Namecheap (dominio).']),
+        ('Proveedores que procesan datos por nosotros', ['Retell AI (números de teléfono, voz con IA, grabaciones y transcripciones); Google Workspace (correo, calendario, hojas de cálculo y la automatización que hace funcionar el servicio); ' + ('Stripe (pagos con tarjeta y suscripciones; Contesta no ve ni guarda el número completo de su tarjeta); ' if ACTIVATION_LIVE else '') + 'GitHub (alojamiento del sitio); Namecheap (dominio).']),
         ('Venta de datos', ['No vendemos información personal ni la compartimos para publicidad.']),
         ('Cuánto tiempo guardamos los datos', ['Grabaciones y transcripciones completas de llamadas: se borran a los 90 días.',
                                                'Datos de la cuenta, incluido el registro de llamadas (fecha, número, nombre, motivo y un resumen corto): se borran 12 meses después de cancelar.',
@@ -684,7 +734,7 @@ LEGAL_TEXT = {
                              '<b>From visitors to this site:</b> a first-party record of pages viewed, language, plan clicked, the general source of the visit (for example "Google" or "direct") and a random session ID. We use no cookies, and that record has no names, emails or phone numbers. Your browser stores your language choice, how you first arrived and your sign-in session for the account page.']),
         ('How we use it', ['To answer and route calls for our customers, book appointments in their calendar, send call summaries, let customers sign in with an emailed link, provide support, and measure in aggregate how the site and signup perform.']),
         ('Calendar access', ['If a business turns on booking, it shares one Google Calendar with hola@usecontesta.com. We read that calendar\'s events to find busy times and create appointments in it. Removing the share ends access.']),
-        ('Service providers that process data for us', ['Retell AI (phone numbers, voice AI, call recordings and transcripts); Google Workspace (email, calendar, spreadsheets and the automation that runs the service); GitHub (website hosting); Namecheap (domain).']),
+        ('Service providers that process data for us', ['Retell AI (phone numbers, voice AI, call recordings and transcripts); Google Workspace (email, calendar, spreadsheets and the automation that runs the service); ' + ('Stripe (card payments and subscriptions; Contesta never sees or stores your full card number); ' if ACTIVATION_LIVE else '') + 'GitHub (website hosting); Namecheap (domain).']),
         ('Selling data', ['We do not sell personal information and do not share it for advertising.']),
         ('How long we keep data', ['Call recordings and full transcripts: deleted after 90 days.',
                                    'Account data, including the call log (date, number, name, reason and a short summary): deleted 12 months after cancellation.',
@@ -699,9 +749,9 @@ LEGAL_TEXT = {
         ('Quién puede usarlo', ['Negocios ubicados en Florida, en hora del Este.']),
         ('Su cuenta', ['Entra a su cuenta con un enlace que le enviamos por correo. Cuide el acceso a ese correo.']),
         ('Planes, prueba y pago', ['Inicial $197, Pro $297 y Máximo $597 al mes, con 150, 400 y 1,000 minutos. Para empezar la prueba gratis de 14 días se pide una tarjeta; no se cobra nada durante la prueba y la mensualidad empieza al terminar, salvo que cancele antes. El plan se cobra mensualmente.',
-                                   'Instalación: $297, sin costo para los primeros cinco negocios.']),
-        ('Si se pasa de los minutos', ['Sofía sigue contestando. Le escribimos y le sugerimos un plan más grande; no cobramos nada extra sin su acuerdo.']),
-        ('Cancelación', ['No hay contrato. Puede cancelar cuando quiera escribiendo a hola@usecontesta.com. El servicio sigue hasta el final del mes pagado y no hay reembolsos por meses parciales. Para que las llamadas dejen de llegar a la asistente de inmediato, quite el desvío de llamadas en su teléfono.']),
+                                   'Instalación: $297, pago único, sin costo para los primeros cinco negocios que empiecen su prueba. Se cobra junto con el primer pago mensual, al terminar la prueba; nunca durante la configuración, mientras espera la activación ni durante la prueba. Si cancela durante la prueba, no se cobra.']),
+        ('Si se pasa de los minutos', ['Los minutos son el tiempo que la asistente está en llamadas, sumado por mes calendario (hora del Este). Si se pasa, Sofía sigue contestando. Le escribimos y le sugerimos un plan más grande; no cobramos nada extra sin su acuerdo.']),
+        ('Cancelación', ['No hay contrato. Puede cancelar cuando quiera ' + ('desde su cuenta ("Administrar pago o cancelar") o ' if ACTIVATION_LIVE else '') + 'escribiendo a hola@usecontesta.com. Si cancela durante la prueba, no se cobra nada. Después, el servicio sigue hasta el final del mes pagado y no hay reembolsos por meses parciales. Para que las llamadas dejen de llegar a la asistente de inmediato, quite el desvío de llamadas en su teléfono.']),
         ('Sus responsabilidades', ['Dar información correcta de su negocio y mantenerla al día; usar el servicio de forma legal; cumplir las leyes que le apliquen sobre grabación y manejo de la información de quienes le llaman (la asistente avisa al inicio de cada llamada que puede ser grabada); no usar el servicio para emergencias; revisar los resúmenes y confirmar lo importante.']),
         ('Límites del servicio', ['La asistente puede entender mal a quien llama, sobre todo con mala conexión; no da consejos médicos, legales ni financieros; las citas dependen del acceso a su calendario; solo se conecta con Google Calendar. No garantizamos un número de citas ni de clientes.']),
         ('Disponibilidad', ['El servicio depende de proveedores externos (Retell AI, Google y las compañías telefónicas). Se ofrece "tal cual" y según disponibilidad, sin garantía de tiempo de funcionamiento, en la medida que la ley lo permita.']),
@@ -714,9 +764,9 @@ LEGAL_TEXT = {
         ('Who can use it', ['Businesses located in Florida, on Eastern time.']),
         ('Your account', ['You sign in with a link we email you. Keep access to that email secure.']),
         ('Plans, trial and payment', ['Starter $197, Pro $297 and Max $597 per month, with 150, 400 and 1,000 minutes. A card is required to start the 14-day free trial; nothing is charged during the trial, and the monthly plan starts when it ends unless you cancel before. Plans are billed monthly.',
-                                      'Setup: $297, waived for the first five businesses.']),
-        ('If you go over your minutes', ['Sofía keeps answering. We email you and suggest a bigger plan; nothing extra is charged unless you agree.']),
-        ('Cancellation', ['No contract. Cancel any time by emailing hola@usecontesta.com. Service runs to the end of the paid month and partial months aren\'t refunded. To stop calls reaching the assistant right away, turn off call forwarding on your phone.']),
+                                      'Setup: $297, one-time, waived for the first five businesses to start a trial. It is charged with the first monthly payment, when the trial ends; never during setup, while waiting for activation or during the trial. Cancel during the trial and it isn\'t charged.']),
+        ('If you go over your minutes', ['Minutes are the time the assistant spends on calls, added up per calendar month (Eastern time). If you go over, Sofía keeps answering. We email you and suggest a bigger plan; nothing extra is charged unless you agree.']),
+        ('Cancellation', ['No contract. Cancel any time ' + ('from your account ("Manage billing or cancel") or ' if ACTIVATION_LIVE else '') + 'by emailing hola@usecontesta.com. Cancel during the trial and nothing is charged. After that, service runs to the end of the paid month and partial months aren\'t refunded. To stop calls reaching the assistant right away, turn off call forwarding on your phone.']),
         ('Your responsibilities', ['Give accurate business information and keep it current; use the service lawfully; comply with the laws that apply to you on recording and handling your callers\' information (the assistant announces at the start of each call that it may be recorded); don\'t use the service for emergencies; review summaries and confirm anything important.']),
         ('Limits of the service', ['The assistant can misunderstand callers, especially on poor connections; it doesn\'t give medical, legal or financial advice; bookings depend on your calendar access; it connects only to Google Calendar. We don\'t guarantee any number of bookings or customers.']),
         ('Availability', ['The service relies on third-party providers (Retell AI, Google and phone carriers). It is provided "as is" and as available, with no uptime guarantee, to the extent the law allows.']),

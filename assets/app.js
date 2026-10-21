@@ -27,12 +27,14 @@
       linkTitle: 'Entre a su cuenta', linkText: 'Escriba el correo con el que se registró y le enviamos un enlace para entrar.', sendLink: 'Enviarme el enlace',
       linkSent: 'Si ese correo tiene una cuenta, el enlace ya va en camino. Revise su bandeja (y spam).', expired: 'Su enlace venció o ya no es válido. Pida uno nuevo aquí.',
       loading: 'Cargando su cuenta…', save: 'Guardar', saving: 'Guardando…', saved: 'Guardado', savedPending: 'Guardado, pero falta información:', updatedAgent: 'Sofía ya usa estos cambios.',
-      states: { registrada: 'Configurando', configurando: 'Configurando', esperando_pago: 'Revisión pendiente: tarjeta', construyendo: 'Construyendo', revision: 'Revisión pendiente', prueba_pendiente: 'Lista para probar', activa: 'Activa' },
+      states: { registrada: 'Configuración en curso', configurando: 'Configuración en curso', lista_espera: 'Lista: esperando activación', esperando_pago: 'Lista: esperando activación', construyendo: 'Construyendo', revision: 'Revisión pendiente', prueba_pendiente: 'Lista para probar', activa: 'Activa', cancelada: 'Cancelada' },
+      stateReady: 'Lista para empezar la prueba',
       partB: 'Configure su negocio', partBHint: 'Siete pasos cortos. Cada uno se guarda por separado; puede volver cuando quiera.',
-      partC: 'Conecte y verifique', partD: 'Tarjeta, prueba y activación',
+      partC: 'Conecte y verifique', partD: 'Prueba, número y activación',
       steps: { negocio: 'Su negocio', servicios: 'Servicios y citas', horario: 'Horario', saludo: 'Saludo', respuestas: 'Respuestas aprobadas', contacto: 'Contacto', escalamiento: 'Transferencias' },
       done: 'Listo', missing: 'Falta',
-      check: { config: 'Datos del negocio completos', cal: 'Google Calendar conectado', pago: 'Tarjeta registrada', numero: 'Recepcionista construida', prueba: 'Llamada de prueba aprobada', reserva: 'Cita de prueba en su calendario', desvio: 'Desvío de llamadas activado (lo confirma usted)', activa: 'Activa' },
+      check: { config: 'Datos del negocio completos', cal: 'Google Calendar conectado', pago: 'Prueba de 14 días iniciada (tarjeta registrada)', numero: 'Recepcionista construida', prueba: 'Llamada de prueba aprobada', reserva: 'Cita de prueba en su calendario', desvio: 'Desvío de llamadas activado (lo confirma usted)', activa: 'Activación completa' },
+      whenOpen: ' — cuando la activación esté disponible',
       opt: '(opcional)'
     },
     en: {
@@ -53,12 +55,14 @@
       linkTitle: 'Sign in to your account', linkText: 'Enter the email you signed up with and we\'ll send you a sign-in link.', sendLink: 'Email me the link',
       linkSent: 'If that email has an account, the link is on its way. Check your inbox (and spam).', expired: 'Your link expired or is no longer valid. Request a new one here.',
       loading: 'Loading your account…', save: 'Save', saving: 'Saving…', saved: 'Saved', savedPending: 'Saved, but something is missing:', updatedAgent: 'Sofía is already using these changes.',
-      states: { registrada: 'Setting up', configurando: 'Setting up', esperando_pago: 'Review pending: card', construyendo: 'Building', revision: 'Review pending', prueba_pendiente: 'Ready to test', activa: 'Live' },
+      states: { registrada: 'Setup in progress', configurando: 'Setup in progress', lista_espera: 'Ready—awaiting activation', esperando_pago: 'Ready—awaiting activation', construyendo: 'Building', revision: 'Review pending', prueba_pendiente: 'Ready to test', activa: 'Live', cancelada: 'Cancelled' },
+      stateReady: 'Ready to start your trial',
       partB: 'Set up your business', partBHint: 'Seven short steps. Each one saves on its own; come back any time.',
-      partC: 'Connect and verify', partD: 'Card, test and go live',
+      partC: 'Connect and verify', partD: 'Trial, number and activation',
       steps: { negocio: 'Your business', servicios: 'Services and booking', horario: 'Hours', saludo: 'Greeting', respuestas: 'Approved answers', contacto: 'Contact', escalamiento: 'Transfers' },
       done: 'Done', missing: 'Missing',
-      check: { config: 'Business details complete', cal: 'Google Calendar connected', pago: 'Card on file', numero: 'Receptionist built', prueba: 'Test call passed', reserva: 'Test booking in your calendar', desvio: 'Call forwarding on (you confirm it)', activa: 'Live' },
+      check: { config: 'Business details complete', cal: 'Google Calendar connected', pago: '14-day trial started (card on file)', numero: 'Receptionist built', prueba: 'Test call passed', reserva: 'Test booking in your calendar', desvio: 'Call forwarding on (you confirm it)', activa: 'Activation complete' },
+      whenOpen: ' — once activation is available',
       opt: '(optional)'
     }
   }[L];
@@ -76,6 +80,7 @@
   }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function pretty(n) { var d = String(n || '').replace(/\D/g, '').slice(-10); return d.length === 10 ? '(' + d.slice(0, 3) + ') ' + d.slice(3, 6) + '-' + d.slice(6) : n; }
+  function fecha(iso) { try { return new Date(iso).toLocaleDateString(L === 'en' ? 'en-US' : 'es-US', { dateStyle: 'long', timeZone: 'America/New_York' }); } catch (e) { return iso; } }
   function when(iso) { if (!iso) return ''; try { return new Date(iso).toLocaleString(L === 'en' ? 'en-US' : 'es-US', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'America/New_York' }); } catch (e) { return iso; } }
   function ev(name, extra) { if (window.ctEvent) window.ctEvent(name, extra); }
 
@@ -155,11 +160,31 @@
     root.innerHTML = ''; root.appendChild(form);
   }
 
+  // Return from Stripe: ?pago=cs_... (verified server-side against Stripe's API) or ?pago=cancelado.
+  var notice = null;
+  function payMsg(err) {
+    var es = L === 'es';
+    return ({ pago_incompleto: es ? 'Stripe todavía no muestra el registro de la tarjeta como completo. Si lo terminó, toque "Actualizar estado" en un minuto. No se cobró nada.' : 'Stripe doesn\'t show the card step as complete yet. If you finished it, tap "Refresh status" in a minute. Nothing was charged.',
+      activacion_pendiente: es ? 'La activación todavía no está disponible. No se cobró nada.' : 'Activation isn\'t available yet. Nothing was charged.',
+      red: T.errs.red })[err] || (es ? 'No pudimos confirmar el pago con Stripe. No se cobró nada que no aparezca en Stripe; escríbanos a hola@usecontesta.com.' : 'We couldn\'t confirm the payment with Stripe. Email hola@usecontesta.com and we\'ll check it.');
+  }
   function load() {
-    var m = location.hash.match(/t=([A-Za-z0-9]+)/);
-    if (m) { tokenStore(m[1]); history.replaceState(null, '', location.pathname); }
+    var es = L === 'es', m = location.hash.match(/t=([A-Za-z0-9]+)/), q = new URLSearchParams(location.search), pago = q.get('pago');
+    if (m) tokenStore(m[1]);
+    if (m || pago) history.replaceState(null, '', location.pathname);
     var t = tokenStore();
-    if (!t) { requestLink(''); return; }
+    if (pago === 'cancelado') notice = { k: 'info', m: es ? 'No terminó el registro de la tarjeta. No se cobró nada y su configuración sigue guardada.' : 'You didn\'t finish adding your card. Nothing was charged and your setup is still saved.' };
+    if (pago && /^cs_(test|live)_[A-Za-z0-9]+$/.test(pago)) {
+      root.innerHTML = ''; root.appendChild(el('p', { 'class': 'status info', role: 'status', text: es ? 'Confirmando su tarjeta con Stripe y preparando su número de Contesta. Puede tardar un minuto…' : 'Confirming your card with Stripe and preparing your Contesta number. This can take a minute…' }));
+      api('pago', { cs: pago, t: t || '' }).then(function (r) {
+        notice = r.ok ? { k: 'ok', m: es ? 'Stripe confirmó su tarjeta: su prueba de 14 días empezó. Le enviamos los detalles por correo.' : 'Stripe confirmed your card: your 14-day trial has started. We emailed you the details.' } : { k: 'warn', m: payMsg(r.error) };
+        if (!t) { requestLink(notice.m); return; }
+        if (r.cuenta) { acc = r.cuenta; render(); return; }
+        load();
+      });
+      return;
+    }
+    if (!t) { requestLink(notice ? notice.m : ''); return; }
     root.innerHTML = ''; root.appendChild(el('p', { 'class': 'status info', text: T.loading }));
     api('cuenta', { t: t }).then(function (r) {
       if (r.ok) { acc = r.cuenta; ev('setup_viewed'); render(); return; }
@@ -257,7 +282,7 @@
       var puede = acc.plan === 'pro' || acc.plan === 'maximo';
       var num = field('numero', es ? 'Número al que transfiere' : 'Number to transfer to', txt('numero', c.numero, { type: 'tel', inputmode: 'tel' }));
       var rad = radios('transferir', { label: es ? '¿Transferir llamadas urgentes?' : 'Transfer urgent calls?', items: [['no', es ? 'No, siempre tomar mensaje' : 'No, always take a message'], ['si', es ? 'Sí, en horario, para urgencias, quejas o si piden hablar con usted' : 'Yes, during business hours, for urgent calls, complaints or callers asking for you', !puede]] }, c.transferir || 'no');
-      kids = [rad, puede ? null : el('p', { 'class': 'small muted', text: es ? 'Las transferencias están en los planes Pro y Máximo. Puede cambiar de plan antes de registrar su tarjeta.' : 'Transfers are included in Pro and Max. You can change plans before adding your card.' }), num];
+      kids = [rad, puede ? null : el('p', { 'class': 'small muted', text: es ? 'Las transferencias están en los planes Pro y Máximo. Puede cambiar de plan arriba, en el resumen de su cuenta, antes de empezar la prueba.' : 'Transfers are included in Pro and Max. You can change plans above, in your account summary, before starting the trial.' }), num];
       var sync3 = function () { num.hidden = val(rad.closest('form') || rad, 'transferir') !== 'si'; };
       rad.addEventListener('change', sync3); setTimeout(sync3);
     }
@@ -316,6 +341,43 @@
 
   var chrome = {};
   var lastCal = null;
+
+  function planChanger() {
+    if (acc.pago || acc.numero) return null;
+    var es = L === 'es';
+    var st = el('div', { 'class': 'status', role: 'status', 'aria-live': 'polite', hidden: true });
+    var opts = el('div', { 'class': 'plan-pick', role: 'radiogroup', 'aria-label': 'Plan' });
+    ['inicial', 'pro', 'maximo'].forEach(function (p) {
+      opts.appendChild(el('label', { 'class': 'choice' }, [el('input', { type: 'radio', name: 'cambio-plan', value: p, checked: p === acc.plan }), el('b', { text: T.plans[p][0] + ' · ' + T.plans[p][1] }), el('span', { 'class': 'small muted', text: T.plans[p][2] })]));
+    });
+    var btn = el('button', { type: 'submit', 'class': 'btn small ghost', text: es ? 'Guardar plan' : 'Save plan' });
+    var form = el('form', { 'class': 'form', novalidate: true }, [el('p', { 'class': 'small muted', text: es ? 'Puede cambiarlo hasta que empiece su prueba. Sus pasos guardados no cambian.' : 'You can change it until your trial starts. Your saved steps stay as they are.' }), opts, st, btn]);
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var p = (form.querySelector('input[name=cambio-plan]:checked') || {}).value;
+      if (!p || p === acc.plan) { status(st, 'info', es ? 'Ese ya es su plan.' : 'That is already your plan.'); return; }
+      btn.disabled = true;
+      api('guardar', { t: tokenStore(), paso: 'plan', datos: { plan: p } }).then(function (r) {
+        btn.disabled = false;
+        if (r.error === 'sesion' || r.error === 'expirada') { tokenStore(null); requestLink(T.expired); return; }
+        if (r.cuenta) acc = r.cuenta;
+        if (r.ok) { notice = { k: 'ok', m: (es ? 'Plan cambiado a ' : 'Plan changed to ') + T.plans[p][0] + '.' }; render(); return; }
+        status(st, 'err', r.error === 'plan_bloqueado' ? (es ? 'Su prueba ya empezó: para cambiar de plan, escríbanos a hola@usecontesta.com.' : 'Your trial has started: to change plans, email hola@usecontesta.com.') : (T.errs[r.error] || T.errs.servidor));
+      });
+    });
+    return el('details', { 'class': 'acc-step' }, [el('summary', {}, [el('span', { text: es ? 'Cambiar de plan' : 'Change plan' })]), el('div', { 'class': 'body' }, [form])]);
+  }
+
+  // Status shown to the owner. Setup states are derived from what the server verified (steps complete, activation open);
+  // "Live" only appears once the backend has recorded activation, and trial wording only once Stripe reports a trial.
+  function stateLabel() {
+    var e = acc.estado, act = acc.activacion || {};
+    if (e === 'registrada' || e === 'configurando' || e === 'lista_espera' || e === 'esperando_pago') {
+      if (!acc.listo) return { t: T.states.configurando, k: '' };
+      return act.disponible ? { t: T.stateReady, k: '' } : { t: T.states.lista_espera, k: '' };
+    }
+    return { t: T.states[e] || e, k: e === 'activa' ? 'ok' : (e === 'revision' || e === 'cancelada' ? 'warn' : '') };
+  }
   function render() {
     root.innerHTML = '';
     var es = L === 'es';
@@ -324,8 +386,10 @@
     var head = el('div', { 'class': 'card stack' }, [
       el('div', { 'class': 'call-head' }, [el('h2', { text: acc.negocio }), chrome.badge]),
       el('p', { 'class': 'muted' }, [(T.plans[acc.plan] || ['', ''])[0] + ' · ' + (T.plans[acc.plan] || ['', ''])[1] + ' · ' + acc.email]),
+      planChanger(),
       chrome.check
     ]);
+    if (notice) { root.appendChild(el('p', { 'class': 'status ' + notice.k, role: 'status', text: notice.m, style: 'margin-bottom:18px' })); notice = null; }
     var stepsWrap = el('div', { 'class': 'stack' });
     chrome.stepBadges = {};
     ['negocio', 'servicios', 'horario', 'saludo', 'respuestas', 'contacto', 'escalamiento'].forEach(function (p, i) {
@@ -347,15 +411,49 @@
     refreshChrome();
   }
 
+  function subCard() {
+    var es = L === 'es', s = acc.suscripcion || {}, inst = acc.instalacion || {}, plan = acc.planInfo || {};
+    var st = el('div', { 'class': 'status', role: 'status', 'aria-live': 'polite', hidden: true });
+    var linea = s.estado === 'trialing' && s.pruebaFin ? { k: 'ok', m: (es ? 'Prueba de 14 días activa. Termina el ' : '14-day trial active. It ends on ') + fecha(s.pruebaFin) + (es ? '. No se cobra nada antes de esa fecha.' : '. Nothing is charged before then.') }
+      : s.estado === 'active' ? { k: 'ok', m: es ? 'Suscripción activa.' : 'Subscription active.' }
+      : (s.estado === 'past_due' || s.estado === 'unpaid') ? { k: 'warn', m: es ? 'El último cobro no pasó. Actualice su tarjeta en "Administrar pago".' : 'The last charge didn\'t go through. Update your card under "Manage billing".' }
+      : s.estado === 'canceled' ? { k: 'warn', m: es ? 'Suscripción cancelada.' : 'Subscription cancelled.' } : { k: 'info', m: s.estado };
+    var pend = es ? 'Instalación: $297, pago único, se cobra con su primer pago mensual.' : 'Setup fee: $297 one-time, charged with your first monthly payment.';
+    var instTxt = { exenta: es ? 'Instalación: sin costo (uno de los primeros cinco negocios).' : 'Setup fee: waived (one of the first five businesses).', pendiente: pend, agregada: pend,
+      cobrada: es ? 'Instalación: pagada.' : 'Setup fee: paid.', anulada: es ? 'Instalación: no se cobra (canceló durante la prueba).' : 'Setup fee: not charged (cancelled during the trial).' }[inst.estado];
+    var kids = [el('h3', { text: es ? 'Su plan y pago' : 'Your plan and billing' }),
+      el('p', { text: (es ? 'Plan ' + plan.es + ': $' + plan.precio + ' al mes, ' : plan.en + ' plan: $' + plan.precio + '/month, ') + plan.minutos + (es ? ' minutos incluidos.' : ' minutes included.') }),
+      el('p', { 'class': 'status ' + linea.k, text: linea.m })];
+    if (s.cancelaEn && s.estado !== 'canceled') kids.push(el('p', { 'class': 'status warn', text: (es ? 'Se cancela el ' : 'Cancels on ') + fecha(s.cancelaEn) + (es ? '. No se cobra nada después de esa fecha.' : '. Nothing is charged after that date.') }));
+    if (instTxt) kids.push(el('p', { 'class': 'small', text: instTxt }));
+    if (s.portal) {
+      var pb = el('button', { type: 'button', 'class': 'btn ghost small', text: es ? 'Administrar pago o cancelar' : 'Manage billing or cancel' });
+      pb.addEventListener('click', function () {
+        pb.disabled = true; status(st, 'info', es ? 'Abriendo Stripe…' : 'Opening Stripe…');
+        api('portal', { t: tokenStore() }).then(function (r) {
+          if (r.ok && r.url) { location.assign(r.url); return; }
+          pb.disabled = false; status(st, 'err', T.errs[r.error] || T.errs.servidor);
+        });
+      });
+      kids.push(st, el('div', { 'class': 'btn-row' }, [pb]));
+    } else kids.push(el('p', { 'class': 'small muted', html: es ? 'Para cancelar o cambiar la tarjeta, escriba a <a href="mailto:hola@usecontesta.com">hola@usecontesta.com</a>.' : 'To cancel or change your card, email <a href="mailto:hola@usecontesta.com">hola@usecontesta.com</a>.' }));
+    return el('div', { 'class': 'card stack' }, kids);
+  }
+
   function refreshChrome() {
     var es = L === 'es';
-    chrome.badge.textContent = T.states[acc.estado] || acc.estado;
-    chrome.badge.className = 'badge ' + (acc.estado === 'activa' ? 'ok' : (acc.estado === 'esperando_pago' || acc.estado === 'revision' ? 'warn' : ''));
+    var sl = stateLabel();
+    chrome.badge.textContent = sl.t;
+    chrome.badge.className = 'badge ' + sl.k;
     Object.keys(chrome.stepBadges).forEach(function (p) { var ok = acc.pasos[p]; chrome.stepBadges[p].textContent = ok ? T.done : T.missing; chrome.stepBadges[p].className = 'badge ' + (ok ? 'ok' : 'warn'); });
     var allSteps = Object.keys(acc.pasos).every(function (p) { return acc.pasos[p]; });
     var items = [['config', allSteps], acc.agenda ? ['cal', !!acc.calendario.verificado] : null, ['pago', acc.pago], ['numero', !!acc.numero], ['prueba', !!acc.prueba], acc.agenda ? ['reserva', !!acc.reserva] : null, ['desvio', !!acc.desvio], ['activa', !!acc.activada]].filter(Boolean);
     chrome.check.innerHTML = '';
-    items.forEach(function (it) { chrome.check.appendChild(el('li', { 'class': it[1] ? 'done' : 'pending' }, [el('span', { 'class': 'dot', 'aria-hidden': 'true', text: it[1] ? '✓' : '' }), el('span', { text: T.check[it[0]] + (it[1] ? '' : (es ? ' — pendiente' : ' — pending')) })])); });
+    var cerrada = !(acc.activacion || {}).disponible && !acc.pago;
+    items.forEach(function (it) {
+      var suf = it[1] ? '' : (cerrada && it[0] === 'pago' ? T.whenOpen : (es ? ' — pendiente' : ' — pending'));
+      chrome.check.appendChild(el('li', { 'class': it[1] ? 'done' : 'pending' }, [el('span', { 'class': 'dot', 'aria-hidden': 'true', text: it[1] ? '✓' : '' }), el('span', { text: T.check[it[0]] + suf })]));
+    });
     renderC(); renderD();
   }
 
@@ -420,32 +518,82 @@
       refresh.disabled = true;
       api('cuenta', { t: tokenStore() }).then(function (r) { refresh.disabled = false; if (r.ok) { acc = r.cuenta; refreshChrome(); } else if (r.error === 'sesion' || r.error === 'expirada') { tokenStore(null); requestLink(T.expired); } else status(st, 'err', T.errs[r.error] || T.errs.servidor); });
     } });
-    if (!acc.listo) {
-      box.appendChild(el('div', { 'class': 'card stack' }, [el('p', { text: es ? 'Cuando termine los pasos de arriba, aquí registra su tarjeta y construimos su recepcionista.' : 'When the steps above are done, you add your card here and we build your receptionist.' })]));
-      return;
-    }
+    var act = acc.activacion || {}, plan = acc.planInfo || {}, inst = acc.instalacion || {};
+    // Shown while activation is closed. The email promise only appears when this account is on the notice list.
+    var espera = function () {
+      return el('p', { 'class': 'status info', text: act.aviso
+        ? (es ? 'Le avisaremos por correo a ' + acc.email + ' cuando la activación de la prueba esté disponible. Su prueba de 14 días no empieza mientras espera y no se cobra nada.' : 'We\'ll email ' + acc.email + ' when trial activation is available. Your 14-day trial won\'t begin while you\'re waiting, and nothing is charged.')
+        : (es ? 'La activación de la prueba todavía no está disponible. Su prueba de 14 días no empieza mientras espera y no se cobra nada.' : 'Trial activation isn\'t available yet. Your 14-day trial won\'t begin while you\'re waiting, and nothing is charged.') });
+    };
+    var cuota = function () {
+      if (inst.fundadorLibre === true) return es ? 'Instalación de $297: no se le cobra; todavía hay cupo entre los primeros cinco negocios que empiezan su prueba.' : '$297 setup fee: waived for you; there are still spots among the first five businesses to start a trial.';
+      return es ? 'Instalación de $297, pago único: se cobra junto con su primer pago mensual, al terminar la prueba. Si cancela durante la prueba, no paga nada. Los primeros cinco negocios que empiezan su prueba no la pagan.' : 'One-time $297 setup fee: charged with your first monthly payment, when the trial ends. Cancel during the trial and you pay nothing. Waived for the first five businesses to start a trial.';
+    };
+    var reglas = function () {
+      return el('ul', { 'class': 'small' }, [
+        el('li', { text: es ? 'La prueba de 14 días empieza cuando registra su tarjeta en la página segura de pago de Stripe. No se cobra nada durante la prueba.' : 'The 14-day trial starts when you add your card on Stripe\'s secure payment page. Nothing is charged during the trial.' }),
+        el('li', { text: es ? 'Al terminar la prueba empieza la mensualidad de $' + plan.precio + ' (plan ' + plan.es + '), salvo que cancele antes.' : 'When the trial ends, $' + plan.precio + '/month (' + plan.en + ' plan) starts unless you cancel before.' }),
+        el('li', { text: cuota() })]);
+    };
     if (!acc.numero) {
-      var btn = el('button', { type: 'button', 'class': 'btn', text: acc.pago ? (es ? 'Construir mi recepcionista' : 'Build my receptionist') : (es ? 'Solicitar activación' : 'Request activation') });
-      var terms = el('ul', { 'class': 'small' }, [el('li', { text: es ? 'Para empezar la prueba de 14 días se pide una tarjeta. No se cobra nada durante la prueba; la mensualidad empieza al terminar si no cancela.' : 'A card is required to start the 14-day trial. Nothing is charged during the trial; the monthly plan starts when it ends unless you cancel.' }),
-        el('li', { text: es ? 'Instalación: $297, sin costo para los primeros 5 negocios.' : 'Setup: $297, waived for the first 5 businesses.' })]);
-      var pend = acc.estado === 'esperando_pago' && !acc.pago;
-      var card = el('div', { 'class': 'card stack' }, [el('h3', { text: es ? 'Tarjeta y construcción' : 'Card and build' }), terms,
-        pend ? el('p', { 'class': 'status warn', text: es ? 'Revisión pendiente: el registro de tarjeta en línea todavía no está disponible. Su configuración está guardada y su solicitud está recibida; le escribimos a ' + acc.email + ' con el siguiente paso.' : 'Review pending: online card entry isn\'t available yet. Your setup is saved and your request is in; we\'ll email ' + acc.email + ' with the next step.' }) : null,
-        acc.revision ? el('p', { 'class': 'status warn', text: acc.motivoRevision === 'industria' ? (es ? 'Revisión pendiente: su tipo de negocio necesita una revisión manual antes de activarse. Le escribimos a ' + acc.email + '.' : 'Review pending: your business type needs a manual review before activation. We\'ll email ' + acc.email + '.') : (es ? 'Revisión pendiente: algo falló al construir. Ya nos llegó el aviso y le escribimos a ' + acc.email + '.' : 'Review pending: the build failed. We were notified and will email ' + acc.email + '.') }) : null,
-        st, el('div', { 'class': 'btn-row' }, [pend || acc.revision ? null : btn, refresh])]);
-      btn.addEventListener('click', function () {
-        btn.disabled = true; status(st, 'info', es ? 'Un momento…' : 'One moment…');
-        api('construir', { t: tokenStore() }).then(function (r) {
-          btn.disabled = false;
-          if (r.error === 'sesion' || r.error === 'expirada') { tokenStore(null); requestLink(T.expired); return; }
-          if (r.cuenta) acc = r.cuenta;
-          if (r.ok || r.error === 'pago' || r.error === 'revision' || r.error === 'incompleto') { refreshChrome(); return; }
-          status(st, 'err', T.errs[r.error] || T.errs.servidor);
+      var card = el('div', { 'class': 'card stack' });
+      if (!acc.listo) {
+        card.appendChild(el('h3', { text: es ? 'Cuando termine la configuración' : 'When setup is done' }));
+        card.appendChild(el('p', { text: act.disponible ? (es ? 'Aquí empieza su prueba de 14 días y construimos su número de Contesta.' : 'This is where you start your 14-day trial and we build your Contesta number.') : (es ? 'Su cuenta queda lista para activar. Todo lo que guarda arriba se conserva.' : 'Your account will be ready to activate. Everything you save above is kept.') }));
+        if (!act.disponible) card.appendChild(espera());
+      } else if (acc.revision) {
+        card.appendChild(el('h3', { text: T.states.revision }));
+        card.appendChild(el('p', { 'class': 'status warn', text: acc.motivoRevision === 'industria' ? (es ? 'Su tipo de negocio necesita una revisión manual antes de activarse. No se cobró nada. Le escribimos a ' + acc.email + '.' : 'Your business type needs a manual review before activation. Nothing was charged. We\'ll email ' + acc.email + '.') : (es ? 'Algo falló al construir su recepcionista. Ya nos llegó el aviso y le escribimos a ' + acc.email + '.' : 'Building your receptionist failed. We were notified and will email ' + acc.email + '.') }));
+        card.appendChild(el('div', { 'class': 'btn-row' }, [refresh]));
+      } else if (acc.pago) {
+        var rb = el('button', { type: 'button', 'class': 'btn', text: es ? 'Construir mi número' : 'Build my number' });
+        card.appendChild(el('h3', { text: es ? 'Construyendo su recepcionista' : 'Building your receptionist' }));
+        card.appendChild(el('p', { text: es ? 'Su prueba ya empezó. Si su número de Contesta no aparece en un par de minutos, toque Construir.' : 'Your trial has started. If your Contesta number doesn\'t appear within a couple of minutes, tap Build.' }));
+        card.appendChild(st); card.appendChild(el('div', { 'class': 'btn-row' }, [rb, refresh]));
+        rb.addEventListener('click', function () {
+          rb.disabled = true; status(st, 'info', es ? 'Construyendo… puede tardar un minuto.' : 'Building… this can take a minute.');
+          api('construir', { t: tokenStore() }).then(function (r) {
+            rb.disabled = false;
+            if (r.error === 'sesion' || r.error === 'expirada') { tokenStore(null); requestLink(T.expired); return; }
+            if (r.cuenta) acc = r.cuenta;
+            if (r.ok || r.error === 'revision') { refreshChrome(); return; }
+            status(st, 'err', T.errs[r.error] || T.errs.servidor);
+          });
         });
-      });
+      } else if (!act.disponible) {
+        card.appendChild(el('h3', { text: T.states.lista_espera }));
+        card.appendChild(el('p', { text: es ? 'Su configuración está completa y guardada. Cuando la activación esté disponible, solo le falta registrar su tarjeta para empezar la prueba; no tendrá que repetir nada.' : 'Your setup is complete and saved. Once activation is available, all that\'s left is adding your card to start the trial; you won\'t have to repeat anything.' }));
+        card.appendChild(espera());
+        card.appendChild(el('p', { 'class': 'small muted', text: es ? 'Cuando se active:' : 'When it opens:' }));
+        card.appendChild(reglas());
+        card.appendChild(el('div', { 'class': 'btn-row' }, [refresh]));
+      } else {
+        var go = el('button', { type: 'button', 'class': 'btn', text: es ? 'Empezar mi prueba de 14 días' : 'Start my 14-day trial' });
+        card.appendChild(el('h3', { text: es ? 'Empiece su prueba de 14 días' : 'Start your 14-day trial' }));
+        if (act.pruebaInterna) card.appendChild(el('p', { 'class': 'status warn', text: es ? 'Modo de prueba de Stripe: solo cuentas internas; use una tarjeta de prueba de Stripe.' : 'Stripe test mode: internal accounts only; use a Stripe test card.' }));
+        card.appendChild(reglas());
+        card.appendChild(st);
+        card.appendChild(el('div', { 'class': 'btn-row' }, [go, refresh]));
+        card.appendChild(el('p', { 'class': 'small muted', html: es ? 'Lo llevamos a la página de pago de Stripe. Al volver, construimos su número de Contesta. <a href="/es/terminos/">Términos</a> · <a href="/es/privacidad/">Privacidad</a>' : 'We take you to Stripe\'s payment page. When you come back, we build your Contesta number. <a href="/en/terms/">Terms</a> · <a href="/en/privacy/">Privacy</a>' }));
+        go.addEventListener('click', function () {
+          go.disabled = true; status(st, 'info', es ? 'Abriendo la página segura de pago…' : 'Opening the secure payment page…');
+          api('checkout', { t: tokenStore() }).then(function (r) {
+            if (r.ok && r.url) { location.assign(r.url); return; }
+            go.disabled = false;
+            if (r.error === 'sesion' || r.error === 'expirada') { tokenStore(null); requestLink(T.expired); return; }
+            if (r.cuenta) acc = r.cuenta;
+            var msg = { cupo: es ? 'Llegamos al cupo de números por ahora. No se cobró nada; ya nos avisaron y le escribimos a ' + acc.email + '.' : 'We\'ve reached our number capacity for now. Nothing was charged; we were notified and will email ' + acc.email + '.',
+              ya_activa: es ? 'Su prueba ya está activa.' : 'Your trial is already active.', limite: T.errs.limite, red: T.errs.red }[r.error];
+            if (r.error === 'revision' || r.error === 'activacion_pendiente' || r.error === 'incompleto' || r.error === 'ya_activa') { if (msg) notice = { k: 'info', m: msg }; render(); return; }
+            status(st, 'err', msg || T.errs.servidor);
+          });
+        });
+      }
+      if (acc.pago && acc.suscripcion && acc.suscripcion.estado) box.appendChild(subCard());
       box.appendChild(card);
       return;
     }
+    if (acc.suscripcion && acc.suscripcion.estado) box.appendChild(subCard());
     // built: test + forwarding
     var num = pretty(acc.numero), d = String(acc.numero).replace(/\D/g, '').slice(-10), cel = ((acc.config.contacto || {}).celular || '').slice(-4);
     box.appendChild(el('div', { 'class': 'card stack' }, [el('h3', { text: es ? '1. Pruebe antes de cambiar su línea' : '1. Test before changing your line' }),
@@ -473,7 +621,7 @@
       el('p', { text: es ? 'Desde el teléfono del negocio, marque el código y llame. Las llamadas que usted no conteste pasan a Sofía; su número no cambia.' : 'From the business phone, dial the code and press call. Calls you don\'t answer go to Sofía; your number stays the same.' }),
       carriers, el('p', { 'class': 'small muted', html: es ? 'Códigos según <a href="https://www.verizon.com/support/call-forwarding-faqs/">Verizon</a> y <a href="https://www.t-mobile.com/support/plans-features/self-service-short-codes">T-Mobile</a>. Para pausar el servicio, quite el desvío: las llamadas vuelven a su teléfono.' : 'Codes per <a href="https://www.verizon.com/support/call-forwarding-faqs/">Verizon</a> and <a href="https://www.t-mobile.com/support/plans-features/self-service-short-codes">T-Mobile</a>. To pause the service, turn forwarding off: calls go back to your phone.' }),
       el('label', { 'class': 'choice' }, [dv, el('span', { text: es ? 'Ya activé el desvío' : 'I turned forwarding on' })]), dst]));
-    box.appendChild(el('div', { 'class': 'card stack' }, [el('h3', { text: es ? '3. Activa' : '3. Live' }),
+    box.appendChild(el('div', { 'class': 'card stack' }, [el('h3', { text: es ? '3. Activación final' : '3. Final activation' }),
       el('p', { 'class': acc.activada ? 'status ok' : 'status info', text: acc.activada ? (es ? 'Su recepcionista está activa desde ' : 'Your receptionist has been live since ') + when(acc.activada) : (es ? 'Se activa cuando pasa la llamada de prueba' + (acc.agenda ? ' y la cita de prueba.' : '.') : 'It goes live when the test call' + (acc.agenda ? ' and the test booking pass.' : ' passes.')) }),
       acc.primeraLlamada ? el('p', { 'class': 'status ok', text: (es ? 'Primera llamada de un cliente: ' : 'First customer call: ') + when(acc.primeraLlamada) }) : null]));
   }

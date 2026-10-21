@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Contesta · Recepcionista virtual en español para negocios de Tampa Bay</title>
+<meta name="description" content="Contesta atiende el teléfono de su negocio las 24 horas, en español y en inglés, y agenda las citas en su Google Calendar. Llame a la demo: (813) 722-1120. 14 días gratis.">
+<meta name="theme-color" content="#0E1C33">
+<link rel="canonical" href="https://usecontesta.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Contesta">
+<meta property="og:title" content="Contesta · Nunca más pierda una llamada">
+<meta property="og:description" content="Recepcionista virtual 24/7 en español e inglés para negocios de Tampa Bay. Llame a la demo: (813) 722-1120.">
+<meta property="og:url" content="https://usecontesta.com/">
+<meta property="og:image" content="https://usecontesta.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gabarito:wght@500;700;800&family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+  /* Layout: a dark "night shift" hero holding a live call transcript, then quiet light sections
+     built around one bold green — the color of the answer button on every phone. */
+  :root {
+    --bg: #F3F6F8;
+    --surface: #FFFFFF;
+    --ink: #10203A;
+    --muted: #5B6B80;
+    --line: #D8E0E8;
+    --accent: #1C9B55;
+    --accent-ink: #FFFFFF;
+    --accent-soft: #E1F4E8;
+    --hero: #0E1C33;
+    --hero-2: #152A4A;
+    --hero-fg: #EAF1F8;
+    --hero-muted: #9FB3CB;
+    --font-display: 'Gabarito', 'Avenir Next', 'Segoe UI', system-ui, sans-serif;
+    --font-body: 'Hanken Grotesk', 'Helvetica Neue', Arial, system-ui, sans-serif;
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0B1526; --surface: #122037; --ink: #EAF1F8; --muted: #9FB0C4; --line: #223650;
+      --accent: #34C06E; --accent-ink: #06180D; --accent-soft: #163A28;
+      --hero: #060E1C; --hero-2: #0E1C33; --hero-fg: #EAF1F8; --hero-muted: #9FB3CB;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0B1526; --surface: #122037; --ink: #EAF1F8; --muted: #9FB0C4; --line: #223650;
+    --accent: #34C06E; --accent-ink: #06180D; --accent-soft: #163A28;
+    --hero: #060E1C; --hero-2: #0E1C33; --hero-fg: #EAF1F8; --hero-muted: #9FB3CB;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 17px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  body[data-lang="es"] .en { display: none !important; }
+  body[data-lang="en"] .es { display: none !important; }
+  h1, h2, h3 { font-family: var(--font-display); line-height: 1.08; margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+  h1 { font-size: clamp(2.3rem, 6vw, 4rem); font-weight: 800; }
+  h2 { font-size: clamp(1.7rem, 3.6vw, 2.5rem); font-weight: 700; }
+  h3 { font-size: 1.2rem; font-weight: 700; }
+  p { margin: 0; }
+  a { color: inherit; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding-inline: 20px; }
+  .eyebrow { font-family: var(--font-display); font-weight: 700; font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
+  .lede { color: var(--muted); font-size: 1.1rem; max-width: 36rem; }
+  section { padding-block: 72px; }
+  .sec-head { display: grid; gap: 12px; max-width: 40rem; margin-bottom: 36px; }
+
+  /* Header */
+  header { background: var(--hero); color: var(--hero-fg); }
+  .nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 18px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 800; font-size: 1.35rem; letter-spacing: -0.01em; }
+  .brand .dot { width: 34px; height: 34px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; flex: none; }
+  .brand .dot svg { width: 18px; height: 18px; }
+  .lang { display: inline-flex; border: 1px solid rgba(255,255,255,0.22); border-radius: 999px; padding: 3px; gap: 2px; }
+  .lang button { background: transparent; color: var(--hero-fg); border: 0; border-radius: 999px; padding: 6px 12px; font: 600 0.85rem var(--font-display); cursor: pointer; letter-spacing: 0.04em; }
+  .lang button[aria-pressed="true"] { background: var(--hero-fg); color: var(--hero); }
+  .lang button:focus-visible, .btn:focus-visible, .copy:focus-visible, summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+
+  /* Hero */
+  .hero { background: linear-gradient(180deg, var(--hero) 0%, var(--hero-2) 100%); color: var(--hero-fg); padding-block: 48px 72px; }
+  .hero-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: center; }
+  .hero .lede { color: var(--hero-muted); }
+  .hero-copy { display: grid; gap: 22px; min-width: 0; }
+  .demo { display: grid; gap: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); border-radius: var(--radius); padding: 18px 20px; }
+  .demo .label { font-family: var(--font-display); font-weight: 700; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+  .demo .num-row { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .num { text-decoration: none; color: inherit; }
+  .demo .num { font-family: var(--font-display); font-weight: 800; font-size: clamp(1.7rem, 4.5vw, 2.4rem); letter-spacing: 0.01em; font-variant-numeric: tabular-nums; }
+  .demo .hint { color: var(--hero-muted); font-size: 0.95rem; }
+  .copy { background: transparent; border: 1px solid rgba(255,255,255,0.3); color: var(--hero-fg); border-radius: 999px; padding: 7px 14px; font: 600 0.85rem var(--font-display); cursor: pointer; }
+  .copy:hover { border-color: var(--hero-fg); }
+  .btn { display: inline-block; background: var(--accent); color: var(--accent-ink); font: 700 1rem var(--font-display); padding: 14px 22px; border-radius: 999px; text-decoration: none; border: 0; cursor: pointer; }
+  .btn.ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--line); }
+  .hero .btn-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .hero .btn.ghost { color: var(--hero-fg); border-color: rgba(255,255,255,0.3); }
+
+  /* Transcript card */
+  .call { background: var(--surface); color: var(--ink); border-radius: 22px; padding: 18px; box-shadow: 0 30px 60px rgba(0,0,0,0.35); min-width: 0; }
+  .call-top { display: flex; align-items: center; gap: 12px; padding: 6px 6px 14px; border-bottom: 1px solid var(--line); }
+  .call-top .ring { width: 40px; height: 40px; border-radius: 50%; background: var(--accent-soft); display: grid; place-items: center; flex: none; position: relative; }
+  .call-top .ring::after { content: ""; position: absolute; inset: -4px; border-radius: 50%; border: 2px solid var(--accent); opacity: 0.5; animation: pulse 2.2s ease-out infinite; }
+  @keyframes pulse { 0% { transform: scale(0.85); opacity: 0.6 } 100% { transform: scale(1.25); opacity: 0 } }
+  .call-top svg { width: 18px; height: 18px; }
+  .call-top .who { display: grid; line-height: 1.25; }
+  .call-top .who b { font-family: var(--font-display); }
+  .call-top .who span { color: var(--muted); font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+  .lines { display: grid; gap: 10px; padding-top: 14px; }
+  .line { display: grid; gap: 3px; max-width: 88%; padding: 10px 13px; border-radius: 16px; font-size: 0.95rem; line-height: 1.4; animation: rise 0.5s ease-out both; }
+  .line small { font-family: var(--font-display); font-weight: 700; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .line.ai { background: var(--accent-soft); border-bottom-left-radius: 6px; }
+  .line.caller { background: var(--bg); justify-self: end; border-bottom-right-radius: 6px; }
+  .line:nth-child(2) { animation-delay: 0.15s } .line:nth-child(3) { animation-delay: 0.3s } .line:nth-child(4) { animation-delay: 0.45s } .line:nth-child(5) { animation-delay: 0.6s }
+  @keyframes rise { from { transform: translateY(8px) } to { transform: translateY(0) } }
+  .result { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; font: 600 0.8rem var(--font-display); }
+  .chip i { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); display: inline-block; }
+
+
+  /* Video */
+  .video-grid { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 48px; align-items: center; }
+  .reel { position: relative; aspect-ratio: 9 / 16; width: 100%; border-radius: 22px; overflow: hidden; background: var(--hero); box-shadow: 0 24px 50px rgba(14,28,51,0.25); }
+  .reel video { width: 100%; height: 100%; display: block; object-fit: cover; }
+  .video-copy { display: grid; gap: 16px; justify-items: start; }
+  .video-copy .lede { max-width: 30rem; }
+  .video-copy ol { margin: 0; padding-left: 20px; color: var(--muted); display: grid; gap: 6px; }
+
+  /* Steps */
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .step { display: grid; gap: 10px; padding: 24px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); min-width: 0; }
+  .step .n { font-family: var(--font-display); font-weight: 800; font-size: 2rem; color: var(--accent); line-height: 1; }
+  .step p { color: var(--muted); }
+
+  /* Who */
+  .who-list { display: flex; flex-wrap: wrap; gap: 10px; }
+  .who-list span { background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; font-weight: 500; }
+
+  /* Features */
+  .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px 28px; }
+  .feat { display: grid; grid-template-columns: 28px 1fr; gap: 12px; align-items: start; min-width: 0; }
+  .feat .tick { width: 28px; height: 28px; border-radius: 50%; background: var(--accent-soft); display: grid; place-items: center; }
+  .feat .tick svg { width: 14px; height: 14px; }
+  .feat b { font-family: var(--font-display); font-weight: 700; display: block; }
+  .feat p { color: var(--muted); font-size: 0.98rem; }
+
+  /* Pricing */
+  .plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; align-items: stretch; }
+  .plan { display: grid; grid-template-rows: auto auto auto 1fr auto; gap: 12px; padding: 26px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); min-width: 0; }
+  .plan.featured { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .plan .name { font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .plan .tag { font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+  .plan .price { font-family: var(--font-display); font-weight: 800; font-size: 2.4rem; line-height: 1; font-variant-numeric: tabular-nums; }
+  .plan .price span { font-size: 1rem; font-weight: 600; color: var(--muted); }
+  .plan .mins { color: var(--muted); }
+  .plan ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 0.95rem; display: grid; gap: 4px; }
+  .plan .btn { text-align: center; }
+  .pricing-note { margin-top: 20px; color: var(--muted); max-width: 46rem; }
+
+  /* FAQ */
+  .faq { display: grid; gap: 10px; max-width: 46rem; }
+  details { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 0 20px; }
+  summary { cursor: pointer; padding-block: 16px; font-family: var(--font-display); font-weight: 700; list-style: none; display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; font-size: 1.3rem; color: var(--accent); flex: none; }
+  details[open] summary::after { content: "–"; }
+  details p { padding-bottom: 18px; color: var(--muted); }
+
+  /* Close + footer */
+  .close { background: var(--hero); color: var(--hero-fg); }
+  .close .wrap { display: grid; gap: 18px; justify-items: start; }
+  .close .num { font-family: var(--font-display); font-weight: 800; font-size: clamp(1.8rem, 5vw, 2.8rem); font-variant-numeric: tabular-nums; }
+  footer { background: var(--hero); color: var(--hero-muted); font-size: 0.85rem; padding-block: 22px 34px; border-top: 1px solid rgba(255,255,255,0.1); }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+  footer a { color: var(--hero-fg); text-decoration: none; }
+
+  @media (max-width: 860px) {
+    .hero-grid, .steps, .features, .plans, .video-grid { grid-template-columns: 1fr; }
+    .reel { max-width: 340px; margin-inline: auto; }
+    .hero { padding-block: 36px 56px; }
+    section { padding-block: 56px; }
+    .call { box-shadow: 0 18px 40px rgba(0,0,0,0.3); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .line, .call-top .ring::after { animation: none; }
+  }
+</style>
+</head>
+<body data-lang="es">
+<header>
+  <div class="wrap nav">
+    <div class="brand">
+      <span class="dot" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25c1.1.37 2.3.57 3.6.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1L6.6 10.8z" fill="#0E1C33"/></svg></span>
+      Contesta
+    </div>
+    <div class="lang" role="group" aria-label="Idioma / Language">
+      <button type="button" id="btn-es" data-lang="es" aria-pressed="true">ES</button>
+      <button type="button" id="btn-en" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow"><span class="es">Recepcionista virtual · Tampa Bay</span><span class="en">Virtual receptionist · Tampa Bay</span></p>
+      <h1><span class="es">Nunca más pierda una llamada. Ni un cliente.</span><span class="en">Never miss a call again. Or a customer.</span></h1>
+      <p class="lede"><span class="es">Contesta atiende su teléfono las 24 horas, en español y en inglés, toma la cita y le manda por correo el resumen de cada llamada. Usted trabaja; nosotros contestamos.</span><span class="en">Contesta answers your business phone 24/7 in Spanish and English, books the appointment, and emails you a summary of every call. You work; we answer.</span></p>
+      <div class="demo" id="demo">
+        <span class="label"><span class="es">Llame a la demo ahora</span><span class="en">Call the demo now</span></span>
+        <div class="num-row">
+          <a class="num" id="demo-number" href="tel:+18137221120">(813) 722-1120</a>
+          <button type="button" class="copy" id="copy-number"><span class="es">Copiar</span><span class="en">Copy</span></button>
+        </div>
+        <p class="hint"><span class="es">Hable con la asistente como si fuera un cliente suyo. Sin registro, sin tarjeta.</span><span class="en">Talk to the assistant as if you were one of your own customers. No signup, no card.</span></p>
+      </div>
+      <div class="btn-row">
+        <a class="btn" href="#precios"><span class="es">Ver planes y empezar</span><span class="en">See plans and start</span></a>
+        <a class="btn ghost" href="#como"><span class="es">Cómo funciona</span><span class="en">How it works</span></a>
+      </div>
+    </div>
+
+    <div class="call" aria-label="Ejemplo de llamada">
+      <div class="call-top">
+        <span class="ring" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25c1.1.37 2.3.57 3.6.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1L6.6 10.8z" fill="#1C9B55"/></svg></span>
+        <div class="who">
+          <b>Taller Hernández</b>
+          <span><span class="es">Llamada entrante · 7:42 pm · sábado</span><span class="en">Incoming call · 7:42 pm · Saturday</span></span>
+        </div>
+      </div>
+      <div class="lines">
+        <div class="line ai"><small>Sofía</small><span class="es">Gracias por llamar a Taller Hernández. Soy Sofía, la asistente virtual. Esta llamada puede ser grabada. ¿En qué le puedo ayudar?</span><span class="en">Thanks for calling Taller Hernández. This is Sofía, the virtual assistant. This call may be recorded. How can I help you?</span></div>
+        <div class="line caller"><small><span class="es">Cliente</span><span class="en">Caller</span></small><span class="es">Necesito una cita para cambio de aceite, el jueves si se puede.</span><span class="en">I need an oil change appointment, Thursday if possible.</span></div>
+        <div class="line ai"><small>Sofía</small><span class="es">Claro. El jueves tengo a las 10 de la mañana o a las 2 de la tarde. ¿Cuál le conviene?</span><span class="en">Of course. Thursday I have 10 AM or 2 PM. Which works for you?</span></div>
+        <div class="line caller"><small><span class="es">Cliente</span><span class="en">Caller</span></small><span class="es">A las 2.</span><span class="en">2 PM.</span></div>
+        <div class="line ai"><small>Sofía</small><span class="es">Perfecto. ¿A nombre de quién le pongo la cita?</span><span class="en">Perfect. What name should I put the appointment under?</span></div>
+      </div>
+      <div class="result">
+        <span class="chip"><i></i><span class="es">Cita: jueves 2:00 pm</span><span class="en">Booked: Thursday 2:00 pm</span></span>
+        <span class="chip"><i></i><span class="es">En su Google Calendar</span><span class="en">In your Google Calendar</span></span>
+        <span class="chip"><i></i><span class="es">Resumen al dueño</span><span class="en">Summary to owner</span></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="video">
+  <div class="wrap video-grid">
+    <div class="reel">
+      <video controls playsinline preload="metadata" poster="/contesta-demo-poster.jpg" aria-label="Video de demostración de Contesta">
+        <source src="/contesta-demo.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="video-copy">
+      <p class="eyebrow"><span class="es">Véala en acción</span><span class="en">See it in action</span></p>
+      <h2><span class="es">Así contesta Sofía, en 55 segundos.</span><span class="en">How Sofía answers, in 55 seconds.</span></h2>
+      <p class="lede"><span class="es">Un cliente llama a una barbería, pide cita para mañana y cuelga con la cita hecha. El dueño ni tocó el teléfono.</span><span class="en">A customer calls a barbershop, asks for an appointment tomorrow, and hangs up booked. The owner never touched the phone.</span></p>
+      <ol>
+        <li><span class="es">Contesta con el nombre de su negocio.</span><span class="en">Answers with your business name.</span></li>
+        <li><span class="es">Ofrece las horas que usted tiene libres.</span><span class="en">Offers the times you have open.</span></li>
+        <li><span class="es">Pone la cita en su Google Calendar y le manda el resumen.</span><span class="en">Puts it in your Google Calendar and sends you the summary.</span></li>
+      </ol>
+      <a class="btn" href="#precios"><span class="es">Empezar mi prueba gratis</span><span class="en">Start my free trial</span></a>
+    </div>
+  </div>
+</section>
+
+<section id="como" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow"><span class="es">Cómo funciona</span><span class="en">How it works</span></p>
+      <h2><span class="es">Listo en una tarde, sin cambiar su número.</span><span class="en">Live in an afternoon, without changing your number.</span></h2>
+    </div>
+    <div class="steps">
+      <div class="step"><span class="n">1</span><h3><span class="es">Regístrese en 5 minutos</span><span class="en">Sign up in 5 minutes</span></h3><p><span class="es">Nos dice su horario, sus servicios y sus precios. La asistente aprende su negocio.</span><span class="en">Tell us your hours, services and prices. The assistant learns your business.</span></p></div>
+      <div class="step"><span class="n">2</span><h3><span class="es">Desvíe su teléfono</span><span class="en">Forward your phone</span></h3><p><span class="es">Un código en su celular y listo. Su número no cambia; sus clientes no notan nada.</span><span class="en">One code on your cell and you're done. Your number stays; customers notice nothing.</span></p></div>
+      <div class="step"><span class="n">3</span><h3><span class="es">Reciba citas y mensajes</span><span class="en">Get appointments and messages</span></h3><p><span class="es">Cada llamada le llega resumida a su correo y la cita queda en su Google Calendar.</span><span class="en">Every call lands in your inbox as a summary, and bookings go straight into your Google Calendar.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section id="quien" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow"><span class="es">Para quién es</span><span class="en">Who it's for</span></p>
+      <h2><span class="es">Si su negocio vive del teléfono, es para usted.</span><span class="en">If your business lives on the phone, it's for you.</span></h2>
+    </div>
+    <div class="who-list">
+      <span><span class="es">Talleres y detailing</span><span class="en">Auto shops and detailing</span></span>
+      <span><span class="es">Salones y barberías</span><span class="en">Salons and barbershops</span></span>
+      <span><span class="es">Restaurantes y food trucks</span><span class="en">Restaurants and food trucks</span></span>
+      <span><span class="es">Limpieza</span><span class="en">Cleaning</span></span>
+      <span><span class="es">Jardinería</span><span class="en">Landscaping</span></span>
+      <span><span class="es">Piscinas</span><span class="en">Pool service</span></span>
+      <span><span class="es">Plomería</span><span class="en">Plumbing</span></span>
+      <span><span class="es">Abogados e inmigración</span><span class="en">Law and immigration offices</span></span>
+      <span><span class="es">Preparadores de impuestos</span><span class="en">Tax preparers</span></span>
+      <span><span class="es">Seguros y bienes raíces</span><span class="en">Insurance and real estate</span></span>
+      <span><span class="es">Guarderías</span><span class="en">Daycares</span></span>
+      <span><span class="es">Transporte y dispatch</span><span class="en">Trucking and dispatch</span></span>
+    </div>
+  </div>
+</section>
+
+<section id="hace" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow"><span class="es">Lo que hace la asistente</span><span class="en">What the assistant does</span></p>
+      <h2><span class="es">Todo lo que haría su mejor recepcionista. A cualquier hora.</span><span class="en">Everything your best receptionist would do. At any hour.</span></h2>
+    </div>
+    <div class="features">
+      <div class="feat"><span class="tick"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="#1C9B55" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><b><span class="es">Contesta en el idioma del cliente</span><span class="en">Answers in the caller's language</span></b><p><span class="es">Español o inglés, con el nombre de su negocio y su tono.</span><span class="en">Spanish or English, with your business name and your tone.</span></p></div></div>
+      <div class="feat"><span class="tick"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="#1C9B55" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><b><span class="es">Responde lo de siempre</span><span class="en">Handles the usual questions</span></b><p><span class="es">Horario, precios, dirección y preguntas frecuentes. Nunca inventa precios.</span><span class="en">Hours, prices, directions and FAQs. It never invents prices.</span></p></div></div>
+      <div class="feat"><span class="tick"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="#1C9B55" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><b><span class="es">Agenda citas</span><span class="en">Books appointments</span></b><p><span class="es">Directo en su Google Calendar, solo en horas que usted tiene libres.</span><span class="en">Straight into your Google Calendar, only at times you have open.</span></p></div></div>
+      <div class="feat"><span class="tick"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="#1C9B55" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><b><span class="es">Toma mensajes y le avisa</span><span class="en">Takes messages and alerts you</span></b><p><span class="es">Cuando no puede agendar, anota nombre, teléfono y motivo para que usted devuelva la llamada.</span><span class="en">When it can't book, it takes name, number and reason so you can call back.</span></p></div></div>
+      <div class="feat"><span class="tick"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="#1C9B55" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><b><span class="es">Contesta de noche y en fin de semana</span><span class="en">Answers nights and weekends</span></b><p><span class="es">Cuando usted cierra, ella sigue contestando y agendando.</span><span class="en">After you close, it keeps answering and booking.</span></p></div></div>
+      <div class="feat"><span class="tick"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="#1C9B55" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><b><span class="es">Resumen de cada llamada</span><span class="en">A summary of every call</span></b><p><span class="es">Quién llamó, qué pidió y qué quedó agendado, en su correo al colgar.</span><span class="en">Who called, what they wanted and what got booked, in your inbox when they hang up.</span></p></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="precios" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow"><span class="es">Precios</span><span class="en">Pricing</span></p>
+      <h2><span class="es">Sin contrato. Cancele cuando quiera. 14 días de prueba gratis.</span><span class="en">No contract. Cancel anytime. 14-day free trial.</span></h2>
+    </div>
+    <div class="plans">
+      <div class="plan">
+        <div class="name"><span><span class="es">Inicial</span><span class="en">Starter</span></span></div>
+        <div class="price">$197<span>/<span class="es">mes</span><span class="en">mo</span></span></div>
+        <p class="mins"><span class="es">150 minutos al mes</span><span class="en">150 minutes per month</span></p>
+        <ul>
+          <li><span class="es">Español e inglés</span><span class="en">Spanish and English</span></li>
+          <li><span class="es">Citas en su Google Calendar</span><span class="en">Google Calendar bookings</span></li>
+          <li><span class="es">Resumen de cada llamada por correo</span><span class="en">Emailed summary of every call</span></li>
+        </ul>
+        <a class="btn ghost" href="https://forms.gle/RRvrMHRgAsF2eMdC7" target="_blank" rel="noopener"><span class="es">Empezar mi prueba gratis</span><span class="en">Start my free trial</span></a>
+      </div>
+      <div class="plan featured">
+        <div class="name"><span>Pro</span><span class="tag"><span class="es">Más elegido</span><span class="en">Most chosen</span></span></div>
+        <div class="price">$297<span>/<span class="es">mes</span><span class="en">mo</span></span></div>
+        <p class="mins"><span class="es">400 minutos al mes</span><span class="en">400 minutes per month</span></p>
+        <ul>
+          <li><span class="es">Todo lo del plan Inicial</span><span class="en">Everything in Starter</span></li>
+          <li><span class="es">Transferencia a su celular</span><span class="en">Transfer to your cell</span></li>
+        </ul>
+        <a class="btn" href="https://forms.gle/RRvrMHRgAsF2eMdC7" target="_blank" rel="noopener"><span class="es">Empezar mi prueba gratis</span><span class="en">Start my free trial</span></a>
+      </div>
+      <div class="plan">
+        <div class="name"><span><span class="es">Máximo</span><span class="en">Max</span></span></div>
+        <div class="price">$597<span>/<span class="es">mes</span><span class="en">mo</span></span></div>
+        <p class="mins"><span class="es">1,000 minutos al mes</span><span class="en">1,000 minutes per month</span></p>
+        <ul>
+          <li><span class="es">Todo lo del plan Pro</span><span class="en">Everything in Pro</span></li>
+          <li><span class="es">Varias líneas o sucursales</span><span class="en">Multiple lines or locations</span></li>
+          <li><span class="es">Soporte prioritario</span><span class="en">Priority support</span></li>
+        </ul>
+        <a class="btn ghost" href="https://forms.gle/RRvrMHRgAsF2eMdC7" target="_blank" rel="noopener"><span class="es">Empezar mi prueba gratis</span><span class="en">Start my free trial</span></a>
+      </div>
+    </div>
+    <p class="pricing-note"><span class="es">Todos los planes incluyen español e inglés, citas en su Google Calendar y el resumen de cada llamada. Los primeros cinco negocios no pagan la instalación ($297).</span><span class="en">Every plan includes Spanish and English, Google Calendar bookings and a summary of every call. The first five businesses pay no setup fee ($297).</span></p>
+  </div>
+</section>
+
+<section id="faq" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow"><span class="es">Preguntas frecuentes</span><span class="en">FAQ</span></p>
+      <h2><span class="es">Lo que todos preguntan antes de empezar.</span><span class="en">What everyone asks before starting.</span></h2>
+    </div>
+    <div class="faq">
+      <details><summary><span class="es">¿Mis clientes van a saber que es una asistente virtual?</span><span class="en">Will my customers know it's a virtual assistant?</span></summary><p><span class="es">Sí, lo dice al contestar. La mayoría prefiere eso a un buzón de voz, porque la llamada se resuelve en el momento.</span><span class="en">Yes, it says so when it answers. Most people prefer that to voicemail, because the call gets handled right then.</span></p></details>
+      <details><summary><span class="es">¿Qué pasa si alguien pregunta algo que no sabe?</span><span class="en">What if someone asks something it doesn't know?</span></summary><p><span class="es">Toma el nombre y el teléfono, y usted lo llama. Nunca inventa precios ni promete lo que usted no aprobó.</span><span class="en">It takes the name and number and you call back. It never invents prices or promises anything you didn't approve.</span></p></details>
+      <details><summary><span class="es">¿Puedo transferir llamadas a mi celular?</span><span class="en">Can it transfer calls to my cell?</span></summary><p><span class="es">Sí. Usted decide cuándo: por ejemplo, solo clientes con urgencia en horario de trabajo.</span><span class="en">Yes. You decide when: for example, only urgent customers during business hours.</span></p></details>
+      <details><summary><span class="es">¿Funciona con mi número actual?</span><span class="en">Does it work with my current number?</span></summary><p><span class="es">Sí. Solo activa el desvío de llamadas en su celular o su línea. Nada cambia para sus clientes.</span><span class="en">Yes. You just turn on call forwarding on your cell or your line. Nothing changes for your customers.</span></p></details>
+      <details><summary><span class="es">¿Es legal grabar llamadas en Florida?</span><span class="en">Is recording calls legal in Florida?</span></summary><p><span class="es">Sí, si se avisa. La asistente lo dice al contestar, en cada llamada.</span><span class="en">Yes, with notice. The assistant gives it when it answers, on every call.</span></p></details>
+      <details><summary><span class="es">¿Y si no me gusta?</span><span class="en">What if I don't like it?</span></summary><p><span class="es">Tiene 14 días gratis para probarla. Si no le convence, cancela y no paga nada. No hay contrato.</span><span class="en">You get 14 days free. If it's not for you, cancel and pay nothing. There's no contract.</span></p></details>
+    </div>
+  </div>
+</section>
+
+<section class="close" id="contacto">
+  <div class="wrap">
+    <p class="eyebrow"><span class="es">Hecho en Tampa para negocios que trabajan</span><span class="en">Built in Tampa for businesses that work</span></p>
+    <h2><span class="es">Llame a la demo y escúchela usted mismo.</span><span class="en">Call the demo and hear it for yourself.</span></h2>
+    <a class="num demo-number-2" href="tel:+18137221120">(813) 722-1120</a>
+    <a class="btn" href="#precios"><span class="es">Ver planes</span><span class="en">See plans</span></a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Contesta LLC · Tampa, FL</span>
+    <a id="footer-email" href="mailto:hola@usecontesta.com">hola@usecontesta.com</a>
+    <a href="/demo"><span class="es">Video de la demo</span><span class="en">Demo video</span></a>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var body = document.body;
+    var btns = { es: document.getElementById('btn-es'), en: document.getElementById('btn-en') };
+    function setLang(l) {
+      if (l !== 'es' && l !== 'en') l = 'es';
+      body.setAttribute('data-lang', l);
+      body.setAttribute('lang', l);
+      btns.es.setAttribute('aria-pressed', String(l === 'es'));
+      btns.en.setAttribute('aria-pressed', String(l === 'en'));
+      try { localStorage.setItem('contesta-lang', l); } catch (e) {}
+    }
+    var initial = 'es';
+    if (location.hash === '#en') initial = 'en';
+    else { try { initial = localStorage.getItem('contesta-lang') || 'es'; } catch (e) {} }
+    setLang(initial);
+    btns.es.addEventListener('click', function () { setLang('es'); });
+    btns.en.addEventListener('click', function () { setLang('en'); });
+
+    var copyBtn = document.getElementById('copy-number');
+    var num = document.getElementById('demo-number');
+    copyBtn.addEventListener('click', function () {
+      var text = num.textContent.trim();
+      var done = function () {
+        var es = copyBtn.querySelector('.es'), en = copyBtn.querySelector('.en');
+        es.textContent = 'Copiado'; en.textContent = 'Copied';
+        setTimeout(function () { es.textContent = 'Copiar'; en.textContent = 'Copy'; }, 1600);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, function () { selectNum(); });
+      } else { selectNum(); }
+    });
+    function selectNum() {
+      var r = document.createRange(); r.selectNodeContents(num);
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+    }
+  })();
+</script>
+</body>
+</html>

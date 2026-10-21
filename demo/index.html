@@ -2,87 +2,20 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Contesta · Demo de 55 segundos</title>
-<meta name="description" content="Vea cómo Sofía, la recepcionista virtual de Contesta, contesta una llamada y agenda la cita en Google Calendar. Llame a la demo: (813) 722-1120.">
-<meta name="theme-color" content="#0E1C33">
-<link rel="canonical" href="https://usecontesta.com/demo">
-<meta property="og:type" content="video.other">
-<meta property="og:site_name" content="Contesta">
-<meta property="og:title" content="Así contesta Sofía, en 55 segundos">
-<meta property="og:description" content="Recepcionista virtual 24/7 en español e inglés. Llame a la demo: (813) 722-1120.">
-<meta property="og:url" content="https://usecontesta.com/demo">
-<meta property="og:image" content="https://usecontesta.com/og.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:video" content="https://usecontesta.com/contesta-demo.mp4">
-<meta property="og:video:type" content="video/mp4">
-<meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gabarito:wght@700;800&family=Hanken+Grotesk:wght@400;500;600&display=swap">
-<style>
-  :root {
-    --bg: #0E1C33; --bg-2: #152A4A; --fg: #EAF1F8; --muted: #9FB3CB; --line: rgba(255,255,255,0.16);
-    --accent: #1C9B55; --accent-ink: #FFFFFF;
-    --font-display: 'Gabarito', 'Avenir Next', 'Segoe UI', system-ui, sans-serif;
-    --font-body: 'Hanken Grotesk', 'Helvetica Neue', Arial, system-ui, sans-serif;
-    color-scheme: dark;
-  }
-  * { box-sizing: border-box; }
-  body { margin: 0; min-height: 100vh; background: linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%); color: var(--fg); font: 17px/1.55 var(--font-body); -webkit-font-smoothing: antialiased; }
-  .wrap { max-width: 960px; margin: 0 auto; padding: 20px 16px 48px; }
-  .brand { display: inline-flex; align-items: center; gap: 10px; font: 800 1.3rem var(--font-display); color: var(--fg); text-decoration: none; }
-  .brand .dot { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; }
-  .brand svg { width: 17px; height: 17px; }
-  .grid { display: grid; grid-template-columns: minmax(0, 360px) minmax(0, 1fr); gap: 48px; align-items: center; margin-top: 32px; }
-  .reel { aspect-ratio: 9 / 16; width: 100%; border-radius: 22px; overflow: hidden; background: #060E1C; box-shadow: 0 30px 60px rgba(0,0,0,0.4); }
-  .reel video { width: 100%; height: 100%; display: block; object-fit: cover; }
-  .copy { display: grid; gap: 18px; }
-  h1 { font: 800 clamp(2rem, 5vw, 3rem)/1.08 var(--font-display); margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
-  p { margin: 0; color: var(--muted); }
-  .en { font-size: 0.92rem; }
-  .call { display: grid; gap: 6px; padding: 18px 20px; border: 1px solid var(--line); border-radius: 14px; background: rgba(255,255,255,0.05); }
-  .call small { font: 700 0.78rem var(--font-display); letter-spacing: 0.1em; text-transform: uppercase; color: #34C06E; }
-  .call a { font: 800 clamp(1.8rem, 5vw, 2.4rem) var(--font-display); color: var(--fg); text-decoration: none; font-variant-numeric: tabular-nums; }
-  .btns { display: flex; flex-wrap: wrap; gap: 12px; }
-  .btn { display: inline-block; background: var(--accent); color: var(--accent-ink); font: 700 1rem var(--font-display); padding: 14px 22px; border-radius: 999px; text-decoration: none; }
-  .btn.ghost { background: transparent; border: 1.5px solid var(--line); }
-  .btn:focus-visible, .call a:focus-visible, .brand:focus-visible { outline: 3px solid #34C06E; outline-offset: 3px; }
-  footer { margin-top: 48px; font-size: 0.85rem; color: var(--muted); }
-  footer a { color: var(--fg); }
-  @media (max-width: 760px) {
-    .grid { grid-template-columns: 1fr; gap: 28px; margin-top: 20px; }
-    .reel { max-width: 360px; margin-inline: auto; }
-  }
-</style>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contesta · Demo</title>
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://usecontesta.com/es/demo/">
+<script>
+/* /demo is the short link used in outreach emails. It is tagged as email so it is not counted as direct or organic. */
+(function () {
+  var q = location.search;
+  if (!/utm_/.test(q)) q = (q ? q + '&' : '?') + 'utm_source=outreach&utm_medium=email';
+  location.replace('/es/demo/' + q + location.hash);
+})();
+</script>
+<noscript><meta http-equiv="refresh" content="0; url=/es/demo/?utm_source=outreach&utm_medium=email"></noscript>
+<style>body{margin:0;font:17px/1.6 system-ui,sans-serif;background:#F7F5EE;color:#173D30;padding:32px 16px}a{color:#173D30}</style>
 </head>
-<body>
-<div class="wrap">
-  <a class="brand" href="/"><span class="dot" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25c1.1.37 2.3.57 3.6.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1L6.6 10.8z" fill="#0E1C33"/></svg></span>Contesta</a>
-  <div class="grid">
-    <div class="reel">
-      <video controls playsinline preload="metadata" poster="/contesta-demo-poster.jpg" aria-label="Video de demostración de Contesta">
-        <source src="/contesta-demo.mp4" type="video/mp4">
-      </video>
-    </div>
-    <div class="copy">
-      <h1>Así contesta Sofía, en 55 segundos.</h1>
-      <p>Un cliente llama a una barbería, pide cita para mañana y cuelga con la cita hecha en Google Calendar. El dueño ni tocó el teléfono.</p>
-      <p class="en">A customer calls a barbershop, books for tomorrow, and the appointment lands in Google Calendar. The owner never touched the phone.</p>
-      <div class="call">
-        <small>Llame a la demo ahora · Call the demo</small>
-        <a href="tel:+18137221120">(813) 722-1120</a>
-        <p>Hable con ella como si fuera un cliente suyo. Las 24 horas.</p>
-      </div>
-      <div class="btns">
-        <a class="btn" href="https://forms.gle/RRvrMHRgAsF2eMdC7" target="_blank" rel="noopener">Empezar mi prueba gratis</a>
-        <a class="btn ghost" href="/#precios">Ver planes</a>
-      </div>
-      <p>14 días gratis · sin contrato · los primeros 5 negocios no pagan instalación.</p>
-    </div>
-  </div>
-  <footer>© 2026 Contesta LLC · Tampa, FL · <a href="mailto:hola@usecontesta.com">hola@usecontesta.com</a></footer>
-</div>
-</body>
+<body><p><a href="/es/demo/">Ver la demo</a> · <a href="/en/demo/">See the demo</a></p></body>
 </html>

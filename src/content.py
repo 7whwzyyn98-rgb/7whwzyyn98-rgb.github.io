@@ -79,6 +79,12 @@ PAGES = {
     'g_compare': P('/es/guias/ia-buzon-o-servicio/', '/en/guides/ai-vs-voicemail-vs-answering-service/',
                    {'title': 'Recepcionista con IA, buzón de voz o servicio de contestadora · Contesta', 'desc': 'Una comparación honesta: qué resuelve cada opción, qué cuesta Contesta, y cuándo conviene más un buzón o una persona.', 'crumb': 'IA, buzón o servicio', 'parent': 'guides'},
                    {'title': 'AI receptionist vs voicemail vs answering service · Contesta', 'desc': 'An honest comparison: what each option solves, what Contesta costs, and when voicemail or a person is the better fit.', 'crumb': 'AI vs voicemail vs service', 'parent': 'guides'}),
+    'privacy': P('/es/privacidad/', '/en/privacy/',
+                 {'title': 'Política de privacidad · Contesta', 'desc': 'Qué datos recoge Contesta, para qué los usa, con quién los procesa y cuánto tiempo los guarda.', 'crumb': 'Privacidad'},
+                 {'title': 'Privacy policy · Contesta', 'desc': 'What data Contesta collects, how it is used, who processes it and how long it is kept.', 'crumb': 'Privacy'}),
+    'terms': P('/es/terminos/', '/en/terms/',
+               {'title': 'Términos del servicio · Contesta', 'desc': 'Planes, prueba de 14 días, minutos, cancelación y responsabilidades del servicio de recepcionista Contesta.', 'crumb': 'Términos'},
+               {'title': 'Terms of service · Contesta', 'desc': 'Plans, 14-day trial, minutes, cancellation and responsibilities for the Contesta receptionist service.', 'crumb': 'Terms'}),
     'signup': P('/es/registro/', '/en/signup/',
                 {'title': 'Cree su cuenta · Contesta', 'desc': 'Elija su plan y cree su cuenta de Contesta.', 'crumb': 'Registro'},
                 {'title': 'Create your account · Contesta', 'desc': 'Choose your plan and create your Contesta account.', 'crumb': 'Sign up'}, noindex=True, app=True),
@@ -358,12 +364,14 @@ def page_body(key, lang):
              ('¿Puedo registrar mi tarjeta hoy?', '<p>Todavía no: estamos habilitando el pago seguro en línea. Puede crear su cuenta y dejar su recepcionista configurada; le escribimos por correo cuando pueda registrar la tarjeta y activar.</p>'),
              ('¿Qué cubre la instalación de $297?', '<p>La construcción de su recepcionista y de su número de Contesta. Los primeros 5 negocios no la pagan.</p>'),
              ('¿Puedo cambiar de plan?', '<p>Sí. Antes de registrar su tarjeta lo cambia en su cuenta; después, escríbanos a hola@usecontesta.com.</p>'),
-             ('¿Cómo cancelo?', '<p>Escríbanos a hola@usecontesta.com. No hay contrato. Para que las llamadas vuelvan a su teléfono de inmediato, quite el desvío desde su teléfono.</p>')] if es else \
+             ('¿Qué pasa si me paso de los minutos?', '<p>Sofía sigue contestando. Le escribimos y le sugerimos un plan más grande; no cobramos nada extra sin su acuerdo.</p>'),
+             ('¿Cómo cancelo?', '<p>Escríbanos a hola@usecontesta.com. No hay contrato. El servicio sigue hasta el final del mes pagado; no hay reembolsos por meses parciales. Para que las llamadas vuelvan a su teléfono de inmediato, quite el desvío desde su teléfono.</p>')] if es else \
             [('When am I charged?', '<p>Nothing during the 14-day trial. A card is added to start the trial, and the monthly price of the plan you chose starts when the trial ends, unless you cancel first.</p>'),
              ('Can I add my card today?', '<p>Not yet: we\'re enabling secure online payment. You can create your account and finish setting up your receptionist; we\'ll email you when you can add the card and activate.</p>'),
              ('What does the $297 setup cover?', '<p>Building your receptionist and your Contesta number. The first 5 businesses don\'t pay it.</p>'),
              ('Can I change plans?', '<p>Yes. Before adding your card you change it in your account; after that, email hola@usecontesta.com.</p>'),
-             ('How do I cancel?', '<p>Email hola@usecontesta.com. There\'s no contract. To send calls back to your phone right away, turn forwarding off from your phone.</p>')]
+             ('What if I go over my minutes?', '<p>Sofía keeps answering. We email you and suggest a bigger plan; nothing extra is charged unless you agree.</p>'),
+             ('How do I cancel?', '<p>Email hola@usecontesta.com. There\'s no contract. Service runs to the end of the paid month; partial months aren\'t refunded. To send calls back to your phone right away, turn forwarding off from your phone.</p>')]
         inc = (['Español e inglés: contesta en el idioma de quien llama', 'Citas en su Google Calendar, sin agendar encima de horas ocupadas', 'Resumen de cada llamada por correo, con la conversación escrita',
                 'Respuestas solo de la información que usted aprobó', 'Aviso de grabación y de asistente virtual en cada llamada'] if es else
                ['English and Spanish: answers in the caller\'s language', 'Appointments in your Google Calendar, never over busy times', 'Email summary of every call, with the written conversation',
@@ -574,12 +582,15 @@ def page_body(key, lang):
 </div></section>
 {cta_band(lang)}'''
 
+
+    if key in ('privacy', 'terms'):
+        return legal(key, lang)
     if key == 'signup':
         return f'''<section class="hero"><div class="wrap grid-2" style="align-items:start">
 <div class="stack"><p class="eyebrow">{"Paso 1 de 3" if es else "Step 1 of 3"}</p><h1 style="font-size:clamp(2rem,4.5vw,3rem)">{"Cree su cuenta." if es else "Create your account."}</h1>
 <p class="lede">{"Solo pedimos lo necesario para crear la cuenta. Lo demás lo configura después, a su ritmo, y se guarda en cada paso." if es else "We only ask for what's needed to create the account. You set up the rest later, at your own pace, and it saves at every step."}</p>
 <div class="card"><div id="app" data-page="signup"><noscript>{"Necesita JavaScript para crear la cuenta. También puede escribirnos a hola@usecontesta.com." if es else "JavaScript is needed to create the account. You can also email hola@usecontesta.com."}</noscript></div>
-<p class="small muted" style="margin-top:14px">{"Usamos su correo para enviarle el enlace de su cuenta y los resúmenes de llamadas." if es else "We use your email to send your account link and call summaries."}</p></div>
+<p class="small muted" style="margin-top:14px">{"Usamos su correo para enviarle el enlace de su cuenta y los resúmenes de llamadas. Al crear su cuenta acepta los" if es else "We use your email to send your account link and call summaries. By creating an account you accept the"} <a href="{u('terms', lang)}">{"Términos" if es else "Terms"}</a> {"y la" if es else "and the"} <a href="{u('privacy', lang)}">{"Política de privacidad" if es else "Privacy policy"}</a>.</p></div>
 <p class="small muted">{"¿Ya tiene cuenta?" if es else "Already have an account?"} <a href="{u('account', lang)}">{"Entrar" if es else "Sign in"}</a></p>
 </div>
 <div class="card sage stack"><h2 style="font-size:1.2rem">{"Qué pasa después" if es else "What happens next"}</h2>
@@ -646,3 +657,87 @@ def industry(lang, kind):
 <p><a href="{u('calendar', lang)}">{"Cómo funcionan las citas en Google Calendar" if es else "How Google Calendar booking works"}</a> · <a href="{u('g_forward', lang)}">{"Cómo desviar sus llamadas" if es else "How to forward your calls"}</a></p>
 </div></section>
 {cta_band(lang)}'''
+
+
+LEGAL_TEXT = {
+    ('privacy', 'es'): ('Política de privacidad', [
+        ('Quiénes somos', ['Contesta LLC, Tampa, Florida. Contacto: <a href="mailto:hola@usecontesta.com">hola@usecontesta.com</a>.']),
+        ('Qué datos recogemos', ['<b>De los negocios que usan Contesta:</b> correo, nombre del negocio y plan; la configuración que nos dan (servicios y precios, horario, dirección o zona de servicio, nombre del dueño, celular, teléfono del negocio, número para transferir, correo del calendario); y la actividad de la cuenta (pasos completados, fechas).',
+                                 '<b>De las personas que llaman a esos negocios:</b> número de teléfono, la grabación de la llamada, una transcripción automática, lo que le dicen a la asistente (nombre, número para devolver la llamada, datos de la cita y, si aplica, la dirección del servicio) y un resumen de la llamada.',
+                                 '<b>De quienes visitan este sitio:</b> un registro propio de páginas vistas, idioma, plan elegido, la fuente general de la visita (por ejemplo, "Google" o "directo") y un identificador de sesión al azar. No usamos cookies, y ese registro no incluye nombres, correos ni teléfonos. Su navegador guarda su idioma, cómo llegó la primera vez y su sesión de la página de cuenta.']),
+        ('Para qué los usamos', ['Para contestar y dirigir las llamadas de nuestros clientes, agendar citas en su calendario, enviar los resúmenes de llamadas, permitir que entren a su cuenta con un enlace por correo, dar soporte y medir en conjunto cómo funcionan el sitio y el registro.']),
+        ('Acceso al calendario', ['Si un negocio activa las citas, comparte un Google Calendar con hola@usecontesta.com. Leemos los eventos de ese calendario para ver las horas ocupadas y creamos las citas en él. Si deja de compartirlo, el acceso termina.']),
+        ('Proveedores que procesan datos por nosotros', ['Retell AI (números de teléfono, voz con IA, grabaciones y transcripciones); Google Workspace (correo, calendario, hojas de cálculo y la automatización que hace funcionar el servicio); GitHub (alojamiento del sitio); Namecheap (dominio).']),
+        ('Venta de datos', ['No vendemos información personal ni la compartimos para publicidad.']),
+        ('Cuánto tiempo guardamos los datos', ['Grabaciones y transcripciones completas de llamadas: se borran a los 90 días.',
+                                               'Datos de la cuenta, incluido el registro de llamadas (fecha, número, nombre, motivo y un resumen corto): se borran 12 meses después de cancelar.',
+                                               'Registro de visitas al sitio: hasta 24 meses.',
+                                               'Los resúmenes que enviamos por correo al dueño de un negocio quedan en el buzón de ese dueño, que los controla. La grabación de demostración de este sitio es de un cliente simulado y se conserva.']),
+        ('Sus opciones', ['Los negocios pueden actualizar su configuración en su cuenta y pedirnos que borremos sus datos. Quien llamó a un negocio puede pedirle al negocio, o a nosotros en hola@usecontesta.com, que borre sus registros de llamada. Respondemos en un plazo de 30 días.']),
+        ('Menores', ['El servicio es para negocios y no está dirigido a menores de 13 años.']),
+        ('Cambios', ['Publicaremos los cambios en esta página con su fecha.']),
+    ]),
+    ('privacy', 'en'): ('Privacy policy', [
+        ('Who we are', ['Contesta LLC, Tampa, Florida. Contact: <a href="mailto:hola@usecontesta.com">hola@usecontesta.com</a>.']),
+        ('What we collect', ['<b>From businesses that use Contesta:</b> email, business name and plan; the setup they give us (services and prices, hours, address or service area, owner name, cell, business phone, transfer number, calendar email); and account activity (steps completed, dates).',
+                             '<b>From people who call those businesses:</b> phone number, a recording of the call, an automatic transcript, what they tell the assistant (name, callback number, appointment details and, when relevant, the service address) and a call summary.',
+                             '<b>From visitors to this site:</b> a first-party record of pages viewed, language, plan clicked, the general source of the visit (for example "Google" or "direct") and a random session ID. We use no cookies, and that record has no names, emails or phone numbers. Your browser stores your language choice, how you first arrived and your sign-in session for the account page.']),
+        ('How we use it', ['To answer and route calls for our customers, book appointments in their calendar, send call summaries, let customers sign in with an emailed link, provide support, and measure in aggregate how the site and signup perform.']),
+        ('Calendar access', ['If a business turns on booking, it shares one Google Calendar with hola@usecontesta.com. We read that calendar\'s events to find busy times and create appointments in it. Removing the share ends access.']),
+        ('Service providers that process data for us', ['Retell AI (phone numbers, voice AI, call recordings and transcripts); Google Workspace (email, calendar, spreadsheets and the automation that runs the service); GitHub (website hosting); Namecheap (domain).']),
+        ('Selling data', ['We do not sell personal information and do not share it for advertising.']),
+        ('How long we keep data', ['Call recordings and full transcripts: deleted after 90 days.',
+                                   'Account data, including the call log (date, number, name, reason and a short summary): deleted 12 months after cancellation.',
+                                   'Website visit records: up to 24 months.',
+                                   'Summaries we email to a business owner stay in that owner\'s inbox, which they control. The demo recording on this site is of a simulated caller and is kept.']),
+        ('Your choices', ['Businesses can update their setup in their account and ask us to delete their data. Someone who called a business can ask that business, or us at hola@usecontesta.com, to delete their call records. We respond within 30 days.']),
+        ('Children', ['The service is for businesses and isn\'t directed to children under 13.']),
+        ('Changes', ['We\'ll post changes on this page with their date.']),
+    ]),
+    ('terms', 'es'): ('Términos del servicio', [
+        ('El servicio', ['Contesta ofrece una recepcionista virtual con IA que contesta las llamadas desviadas de su negocio, responde con la información que usted aprueba, agenda citas en un Google Calendar que usted comparte, toma mensajes, puede transferir llamadas en los planes que lo incluyen y le envía por correo un resumen de cada llamada. La asistente siempre dice que es una asistente virtual y que la llamada puede ser grabada.']),
+        ('Quién puede usarlo', ['Negocios ubicados en Florida, en hora del Este.']),
+        ('Su cuenta', ['Entra a su cuenta con un enlace que le enviamos por correo. Cuide el acceso a ese correo.']),
+        ('Planes, prueba y pago', ['Inicial $197, Pro $297 y Máximo $597 al mes, con 150, 400 y 1,000 minutos. Para empezar la prueba gratis de 14 días se pide una tarjeta; no se cobra nada durante la prueba y la mensualidad empieza al terminar, salvo que cancele antes. El plan se cobra mensualmente.',
+                                   'Instalación: $297, sin costo para los primeros cinco negocios.']),
+        ('Si se pasa de los minutos', ['Sofía sigue contestando. Le escribimos y le sugerimos un plan más grande; no cobramos nada extra sin su acuerdo.']),
+        ('Cancelación', ['No hay contrato. Puede cancelar cuando quiera escribiendo a hola@usecontesta.com. El servicio sigue hasta el final del mes pagado y no hay reembolsos por meses parciales. Para que las llamadas dejen de llegar a la asistente de inmediato, quite el desvío de llamadas en su teléfono.']),
+        ('Sus responsabilidades', ['Dar información correcta de su negocio y mantenerla al día; usar el servicio de forma legal; cumplir las leyes que le apliquen sobre grabación y manejo de la información de quienes le llaman (la asistente avisa al inicio de cada llamada que puede ser grabada); no usar el servicio para emergencias; revisar los resúmenes y confirmar lo importante.']),
+        ('Límites del servicio', ['La asistente puede entender mal a quien llama, sobre todo con mala conexión; no da consejos médicos, legales ni financieros; las citas dependen del acceso a su calendario; solo se conecta con Google Calendar. No garantizamos un número de citas ni de clientes.']),
+        ('Disponibilidad', ['El servicio depende de proveedores externos (Retell AI, Google y las compañías telefónicas). Se ofrece "tal cual" y según disponibilidad, sin garantía de tiempo de funcionamiento, en la medida que la ley lo permita.']),
+        ('Responsabilidad', ['En la medida que la ley lo permita, la responsabilidad total de Contesta por cualquier reclamo se limita a lo que usted pagó en los 3 meses anteriores al reclamo.']),
+        ('Cambios de precio o de términos', ['Le avisaremos por correo al menos 30 días antes de que un cambio de precio entre en vigor. Otros cambios a estos términos se publican en esta página con su fecha.']),
+        ('Ley aplicable y contacto', ['Florida. Contacto: <a href="mailto:hola@usecontesta.com">hola@usecontesta.com</a>.']),
+    ]),
+    ('terms', 'en'): ('Terms of service', [
+        ('The service', ['Contesta provides an AI virtual receptionist that answers your business\'s forwarded calls, answers from the information you approve, books appointments in a Google Calendar you share, takes messages, can transfer calls on plans that include transfers and emails you a summary of each call. The assistant always says it is a virtual assistant and that the call may be recorded.']),
+        ('Who can use it', ['Businesses located in Florida, on Eastern time.']),
+        ('Your account', ['You sign in with a link we email you. Keep access to that email secure.']),
+        ('Plans, trial and payment', ['Starter $197, Pro $297 and Max $597 per month, with 150, 400 and 1,000 minutes. A card is required to start the 14-day free trial; nothing is charged during the trial, and the monthly plan starts when it ends unless you cancel before. Plans are billed monthly.',
+                                      'Setup: $297, waived for the first five businesses.']),
+        ('If you go over your minutes', ['Sofía keeps answering. We email you and suggest a bigger plan; nothing extra is charged unless you agree.']),
+        ('Cancellation', ['No contract. Cancel any time by emailing hola@usecontesta.com. Service runs to the end of the paid month and partial months aren\'t refunded. To stop calls reaching the assistant right away, turn off call forwarding on your phone.']),
+        ('Your responsibilities', ['Give accurate business information and keep it current; use the service lawfully; comply with the laws that apply to you on recording and handling your callers\' information (the assistant announces at the start of each call that it may be recorded); don\'t use the service for emergencies; review summaries and confirm anything important.']),
+        ('Limits of the service', ['The assistant can misunderstand callers, especially on poor connections; it doesn\'t give medical, legal or financial advice; bookings depend on your calendar access; it connects only to Google Calendar. We don\'t guarantee any number of bookings or customers.']),
+        ('Availability', ['The service relies on third-party providers (Retell AI, Google and phone carriers). It is provided "as is" and as available, with no uptime guarantee, to the extent the law allows.']),
+        ('Liability', ['To the extent the law allows, Contesta\'s total liability for any claim is limited to the fees you paid in the 3 months before the claim.']),
+        ('Changes to prices or terms', ['We\'ll email you at least 30 days before a price change takes effect. Other changes to these terms are posted on this page with their date.']),
+        ('Governing law and contact', ['Florida. Contact: <a href="mailto:hola@usecontesta.com">hola@usecontesta.com</a>.']),
+    ]),
+}
+
+
+def legal(key, lang):
+    es = lang == 'es'
+    title, sections = LEGAL_TEXT[(key, lang)]
+    body = ''
+    for h, paras in sections:
+        if len(paras) > 1:
+            body += f'<h2>{E(h)}</h2><ul>' + ''.join(f'<li>{p}</li>' for p in paras) + '</ul>'
+        else:
+            body += f'<h2>{E(h)}</h2><p>{paras[0]}</p>'
+    other = 'terms' if key == 'privacy' else 'privacy'
+    return f'''<section class="hero"><div class="wrap narrow stack"><!--CRUMBS-->
+<h1>{E(title)}</h1><p class="muted">{"Vigente desde el 21 de octubre de 2026." if es else "Effective October 21, 2026."}</p></div></section>
+<section class="tight"><div class="wrap narrow article">{body}
+<p class="muted small">{"Vea también:" if es else "See also:"} <a href="{u(other, lang)}">{PAGES[other][lang]['crumb']}</a></p></div></section>'''

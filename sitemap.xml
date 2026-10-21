@@ -168,4 +168,32 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://usecontesta.com/en/guides/ai-vs-voicemail-vs-answering-service/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://usecontesta.com/es/guias/ia-buzon-o-servicio/"/>
   </url>
+  <url>
+    <loc>https://usecontesta.com/es/privacidad/</loc>
+    <lastmod>2026-10-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://usecontesta.com/es/privacidad/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://usecontesta.com/en/privacy/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://usecontesta.com/es/privacidad/"/>
+  </url>
+  <url>
+    <loc>https://usecontesta.com/en/privacy/</loc>
+    <lastmod>2026-10-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://usecontesta.com/es/privacidad/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://usecontesta.com/en/privacy/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://usecontesta.com/es/privacidad/"/>
+  </url>
+  <url>
+    <loc>https://usecontesta.com/es/terminos/</loc>
+    <lastmod>2026-10-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://usecontesta.com/es/terminos/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://usecontesta.com/en/terms/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://usecontesta.com/es/terminos/"/>
+  </url>
+  <url>
+    <loc>https://usecontesta.com/en/terms/</loc>
+    <lastmod>2026-10-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://usecontesta.com/es/terminos/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://usecontesta.com/en/terms/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://usecontesta.com/es/terminos/"/>
+  </url>
 </urlset>

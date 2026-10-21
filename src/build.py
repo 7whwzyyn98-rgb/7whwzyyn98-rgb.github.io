@@ -99,6 +99,7 @@ def footer(key, lang):
 <div class="foot-grid"><div class="stack"><p class="foot-brand">Contesta</p><p>{html.escape(f['tag'])}</p>
 <p><a href="mailto:hola@usecontesta.com">hola@usecontesta.com</a><br>{html.escape(f['demo'])} <a href="tel:+18137221120">(813) 722-1120</a></p></div>{cols}</div>
 <div class="foot-legal"><span>© 2026 Contesta LLC · Tampa, Florida</span><span>{html.escape(f['legal'])}</span>
+<a href="{url('privacy', lang)}">{html.escape(PAGES['privacy'][lang]['crumb'])}</a><a href="{url('terms', lang)}">{html.escape(PAGES['terms'][lang]['crumb'])}</a>
 <a href="{url(key, other)}" hreflang="{other}" lang="{other}" data-lang-switch="{other}">{html.escape(f['switch'])}</a></div>
 </div></footer>'''
 

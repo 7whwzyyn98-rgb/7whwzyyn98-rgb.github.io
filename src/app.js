@@ -425,6 +425,8 @@
       el('p', { text: (es ? 'Plan ' + plan.es + ': $' + plan.precio + ' al mes, ' : plan.en + ' plan: $' + plan.precio + '/month, ') + plan.minutos + (es ? ' minutos incluidos.' : ' minutes included.') }),
       el('p', { 'class': 'status ' + linea.k, text: linea.m })];
     if (s.cancelaEn && s.estado !== 'canceled') kids.push(el('p', { 'class': 'status warn', text: (es ? 'Se cancela el ' : 'Cancels on ') + fecha(s.cancelaEn) + (es ? '. No se cobra nada después de esa fecha.' : '. Nothing is charged after that date.') }));
+    if (s.cancelaEn && s.estado === 'trialing' && (inst.estado === 'pendiente' || inst.estado === 'agregada' || inst.estado === 'anulada'))
+      instTxt = es ? 'Instalación: no se cobra, porque la prueba termina cancelada.' : 'Setup fee: not charged, because the trial ends cancelled.';
     if (instTxt) kids.push(el('p', { 'class': 'small', text: instTxt }));
     if (s.portal) {
       var pb = el('button', { type: 'button', 'class': 'btn ghost small', text: es ? 'Administrar pago o cancelar' : 'Manage billing or cancel' });

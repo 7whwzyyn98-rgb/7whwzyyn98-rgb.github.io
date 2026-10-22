@@ -20,7 +20,7 @@ E = html.escape
 # waiting note beside it, and the availability notices show. Flip to True only after the LIVE Stripe flow is verified end
 # to end and the backend Script Property ACTIVACION is 'abierta'; then rebuild. That switches every CTA to
 # "Start your 14-day trial", removes the notices and adds Stripe to the privacy policy's processor list.
-ACTIVATION_LIVE = False
+ACTIVATION_LIVE = True
 
 
 def cta_text(lang):

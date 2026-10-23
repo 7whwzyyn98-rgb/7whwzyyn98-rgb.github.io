@@ -165,27 +165,32 @@ def redirects():
 <body><p><a href="/es/">Español</a> · <a href="/en/">English</a></p></body>
 </html>
 ''')
-    d = ROOT / 'demo'; d.mkdir(exist_ok=True)
-    (d / 'index.html').write_text('''<!doctype html>
+    # Short links used in outreach emails (/demo, /empezar). Tagged as email so those visits and signups aren't counted as
+    # direct or organic.
+    for slug, dest, en_dest, title, es_label, en_label in [
+            ('demo', '/es/demo/', '/en/demo/', 'Contesta · Demo', 'Ver la demo', 'See the demo'),
+            ('empezar', '/es/registro/', '/en/signup/', 'Contesta · Empezar', 'Crear mi cuenta', 'Create my account')]:
+        d = ROOT / slug; d.mkdir(exist_ok=True)
+        (d / 'index.html').write_text(f'''<!doctype html>
 <html lang="es">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Contesta · Demo</title>
+<title>{title}</title>
 <meta name="robots" content="noindex">
-<link rel="canonical" href="https://usecontesta.com/es/demo/">
+<link rel="canonical" href="https://usecontesta.com{dest}">
 <script>
-/* /demo is the short link used in outreach emails. It is tagged as email so it is not counted as direct or organic. */
-(function () {
+/* /{slug} is a short link used in outreach emails. It is tagged as email so it is not counted as direct or organic. */
+(function () {{
   var q = location.search;
   if (!/utm_/.test(q)) q = (q ? q + '&' : '?') + 'utm_source=outreach&utm_medium=email';
-  location.replace('/es/demo/' + q + location.hash);
-})();
+  location.replace('{dest}' + q + location.hash);
+}})();
 </script>
-<noscript><meta http-equiv="refresh" content="0; url=/es/demo/?utm_source=outreach&utm_medium=email"></noscript>
-<style>body{margin:0;font:17px/1.6 system-ui,sans-serif;background:#F7F5EE;color:#173D30;padding:32px 16px}a{color:#173D30}</style>
+<noscript><meta http-equiv="refresh" content="0; url={dest}?utm_source=outreach&utm_medium=email"></noscript>
+<style>body{{margin:0;font:17px/1.6 system-ui,sans-serif;background:#F7F5EE;color:#173D30;padding:32px 16px}}a{{color:#173D30}}</style>
 </head>
-<body><p><a href="/es/demo/">Ver la demo</a> · <a href="/en/demo/">See the demo</a></p></body>
+<body><p><a href="{dest}">{es_label}</a> · <a href="{en_dest}">{en_label}</a></p></body>
 </html>
 ''')
 

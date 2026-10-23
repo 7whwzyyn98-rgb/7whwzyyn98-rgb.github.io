@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contesta · Start</title>
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://usecontesta.com/en/signup/">
+<script>
+/* /start is a short link used in outreach emails. It is tagged as email so it is not counted as direct or organic. */
+(function () {
+  var q = location.search;
+  if (!/utm_/.test(q)) q = (q ? q + '&' : '?') + 'utm_source=outreach&utm_medium=email';
+  location.replace('/en/signup/' + q + location.hash);
+})();
+</script>
+<noscript><meta http-equiv="refresh" content="0; url=/en/signup/?utm_source=outreach&utm_medium=email"></noscript>
+<style>body{margin:0;font:17px/1.6 system-ui,sans-serif;background:#F7F5EE;color:#173D30;padding:32px 16px}a{color:#173D30}</style>
+</head>
+<body><p><a href="/en/signup/">Create my account</a> · <a href="/en/signup/">Create my account</a></p></body>
+</html>

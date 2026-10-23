@@ -169,7 +169,9 @@ def redirects():
     # direct or organic.
     for slug, dest, en_dest, title, es_label, en_label in [
             ('demo', '/es/demo/', '/en/demo/', 'Contesta · Demo', 'Ver la demo', 'See the demo'),
-            ('empezar', '/es/registro/', '/en/signup/', 'Contesta · Empezar', 'Crear mi cuenta', 'Create my account')]:
+            ('empezar', '/es/registro/', '/en/signup/', 'Contesta · Empezar', 'Crear mi cuenta', 'Create my account'),
+            ('video', '/en/demo/', '/en/demo/', 'Contesta · Demo', 'See the demo', 'See the demo'),
+            ('start', '/en/signup/', '/en/signup/', 'Contesta · Start', 'Create my account', 'Create my account')]:
         d = ROOT / slug; d.mkdir(exist_ok=True)
         (d / 'index.html').write_text(f'''<!doctype html>
 <html lang="es">
